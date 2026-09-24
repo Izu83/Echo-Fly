@@ -132,7 +132,12 @@ Only if the first demo goes somewhere. The fly is placed **blind inside a buildi
 </p>
 <p align="center"><sub>The level: black = walls (4 m), green = room walls, blue = door, red = low obstacles (0.8 m).</sub></p>
 
-**Try it:** download the repo and open [`RayCastV1/index.html`](RayCastV1/index.html) in a browser. There's nothing to install. Click the view, look around with the mouse, hold **E** (or left click) to scan, walk with **W A S D**, and press **Tab** for the map. The full controls are in [`RayCastV1/README.md`](RayCastV1/README.md).
+**Play it:** [https://izu83.github.io/Echo-Fly/RayCastV1/](https://izu83.github.io/Echo-Fly/RayCastV1/), on a computer or a phone. You can also download the repo and open [`RayCastV1/index.html`](RayCastV1/index.html) directly.
+
+- **Computer:** click the view, look around with the mouse, hold **E** (or left click) to scan, walk with **W A S D**, and press **Tab** for the map.
+- **Phone:** turn it sideways, drag to look, use the left stick to walk, and hold **Scan**.
+
+The full controls are in [`RayCastV1/README.md`](RayCastV1/README.md).
 
 **What might come next:** right now a human is driving. The idea is to eventually swap the human for the fly brain, turning echoes into sensory-neuron input and letting the fly's motor neurons do the walking and turning. That's still a big "if".
 

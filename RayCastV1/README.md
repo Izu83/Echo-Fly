@@ -2,7 +2,9 @@
 
 A first-person laser sonar for a blind user. The walls are invisible: every scan fires thousands of lasers, and each hit lights up briefly when its echo returns.
 
-Open `index.html` in a browser. No install or server needed.
+**Play it online:** [https://izu83.github.io/Echo-Fly/RayCastV1/](https://izu83.github.io/Echo-Fly/RayCastV1/). It works on a computer or a phone.
+
+Or open `index.html` in a browser. No install or server needed.
 
 ## Controls
 
@@ -20,6 +22,21 @@ Open `index.html` in a browser. No install or server needed.
 | C | Colour by surface / distance |
 | T | Speak last scan summary |
 | M | Reveal everything (tester mode) |
+
+## On a phone
+
+Turn the phone sideways for a full-screen view.
+
+| Touch | Action |
+|---|---|
+| Drag on the view | Look around |
+| Left stick | Walk and side-step |
+| Hold **Scan** | Scan |
+| **Up** / **Down** | Fly up / down |
+| **Map** | Big map |
+| **Full screen** | Full screen (where the browser allows it) |
+
+Phones start with 3000 lasers per scan instead of 6000 to keep things smooth. You can change it in the Lasers panel.
 
 ## Map
 

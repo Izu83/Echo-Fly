@@ -5,21 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Echo Room</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira:wght@400;500;600;700&display=swap">
 <style>
   :root {
     color-scheme: dark;
-    --ground: #0a0f14;
-    --panel: #111922;
-    --line: #22303d;
-    --wall: #b8c6d3;
-    --text: #dfe7ee;
-    --muted: #7f8e9c;
-    --laser: #ff5b4a;
-    --echo: #58d0ff;
-    --player: #ffb547;
-    --display: "Barlow Condensed", "Arial Narrow", sans-serif;
-    --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+    --ground: #1E181C;
+    --panel: #32292F;
+    --line: #4A3D46;
+    --wall: #99E1D9;
+    --text: #F4F1F3;
+    --muted: #B9AEB5;
+    --laser: #FF8FA3;
+    --echo: #99E1D9;
+    --player: #F7C59F;
+    --display: "Saira", "Arial Narrow", sans-serif;
+    --mono: "Saira", system-ui, sans-serif;
   }
   [hidden] { display: none !important; }
   html, body { height: 100%; }
@@ -45,20 +45,20 @@
   @media (max-width: 860px) { .main { grid-template-columns: 1fr; } }
 
   .stage {
-    position: relative; background: #05080b; border: 1px solid var(--line); border-radius: 6px;
+    position: relative; background: #140F13; border: 1px solid var(--line); border-radius: 6px;
     overflow: hidden;
   }
-  canvas#view { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: #05080b; }
+  canvas#view { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: #140F13; }
   canvas#view:focus-visible { outline: 2px solid var(--echo); outline-offset: -2px; }
   .overlay {
-    position: absolute; inset: 0; display: grid; place-items: center; background: rgba(5,8,11,.82);
+    position: absolute; inset: 0; display: grid; place-items: center; background: rgba(20,15,19,.84);
     text-align: center; padding: 16px;
   }
   .overlay .box { display: grid; gap: 12px; justify-items: center; max-width: 440px; }
   .overlay p { margin: 0; color: var(--muted); line-height: 1.5; }
   .big {
     font-family: var(--display); font-size: 22px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
-    background: var(--echo); color: #04121a; border: 0; border-radius: 4px; padding: 10px 22px; cursor: pointer;
+    background: var(--echo); color: #32292F; border: 0; border-radius: 4px; padding: 10px 22px; cursor: pointer;
   }
   .big:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--player); outline-offset: 2px; }
   .hud {
@@ -75,7 +75,7 @@
   .reads { display: grid; gap: 6px; }
   .read { display: grid; grid-template-columns: 56px 1fr 62px; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; }
   .read .lab { color: var(--muted); font-size: 11px; }
-  .read .bar { height: 8px; background: #0a1016; border-radius: 2px; overflow: hidden; }
+  .read .bar { height: 8px; background: #251E23; border-radius: 2px; overflow: hidden; }
   .read .bar i { display: block; height: 100%; width: 0; background: var(--echo); transition: width .15s; }
   .read .val { text-align: right; font-weight: 600; }
   .read.near .bar i { background: var(--laser); }
@@ -86,7 +86,7 @@
   .row output { font-variant-numeric: tabular-nums; min-width: 52px; text-align: right; }
   input[type=range] { grid-column: 1 / -1; width: 100%; accent-color: var(--echo); }
   select, input[type=number] {
-    background: #0a1016; color: var(--text); border: 1px solid var(--line); border-radius: 4px;
+    background: #251E23; color: var(--text); border: 1px solid var(--line); border-radius: 4px;
     font: inherit; padding: 4px 6px;
   }
   input[type=number] { width: 72px; }
@@ -94,23 +94,16 @@
   .check input { accent-color: var(--echo); }
   .btns { display: flex; flex-wrap: wrap; gap: 8px; }
   button.s {
-    background: #0a1016; color: var(--text); border: 1px solid var(--line); border-radius: 4px;
+    background: #251E23; color: var(--text); border: 1px solid var(--line); border-radius: 4px;
     font: inherit; padding: 6px 10px; cursor: pointer;
   }
   button.s:hover { border-color: var(--echo); }
   .keys { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; color: var(--muted); }
   kbd {
-    font-family: var(--mono); font-size: 11px; color: var(--text); background: #0a1016;
+    font-family: var(--mono); font-size: 11px; color: var(--text); background: #251E23;
     border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 3px; padding: 1px 5px; white-space: nowrap;
   }
 
-  .pad { display: none; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .pad button {
-    background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 6px;
-    font-family: var(--display); font-size: 18px; padding: 14px 0; touch-action: manipulation; user-select: none;
-  }
-  .pad .ping { grid-column: 1 / -1; background: var(--echo); color: #04121a; font-weight: 700; letter-spacing: .1em; }
-  @media (hover: none) { .pad { display: grid; } }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 </style>
 
@@ -119,19 +112,88 @@
   .reads .kv .lab { color: var(--muted); font-size: 11px; }
   .reads .kv .v { font-weight: 600; }
   .reads .kv .v small { font-weight: 400; color: var(--muted); margin-left: 6px; }
-  .mix { display: flex; height: 8px; border-radius: 2px; overflow: hidden; background: #0a1016; }
+  .mix { display: flex; height: 8px; border-radius: 2px; overflow: hidden; background: #251E23; }
   .mix i { display: block; height: 100%; }
   .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; color: var(--muted); font-size: 11px; }
   .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
   .stage.locked canvas#view { cursor: none; }
   canvas#view { cursor: pointer; }
+  h1 small {
+    font-size: 13px; font-weight: 600; letter-spacing: .14em; color: var(--muted); margin-left: 10px;
+    vertical-align: middle;
+  }
+
+  /* ---------- touch controls (phones / tablets) ---------- */
+  .touch { display: none; user-select: none; -webkit-user-select: none; }
+  .touch button {
+    font-family: var(--display); font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    background: rgba(50, 41, 47, .78); color: var(--text); border: 1px solid var(--line);
+    border-radius: 999px; touch-action: none; -webkit-tap-highlight-color: transparent;
+  }
+  .touch button.on { border-color: var(--echo); color: var(--echo); }
+  .touch .joy {
+    position: relative; width: 132px; height: 132px; border-radius: 50%; touch-action: none;
+    background: rgba(50, 41, 47, .55); border: 2px solid rgba(153, 225, 217, .45);
+  }
+  .touch .joy i {
+    position: absolute; left: 50%; top: 50%; width: 56px; height: 56px; margin: -28px 0 0 -28px; border-radius: 50%;
+    background: var(--echo); opacity: .85; pointer-events: none;
+  }
+  .touch .right { display: grid; grid-template-columns: auto auto; gap: 10px; align-items: end; }
+  .touch .small { display: grid; gap: 8px; }
+  .touch .small button { font-size: 13px; padding: 9px 14px; }
+  .touch .scan {
+    width: 104px; height: 104px; font-size: 20px; background: var(--echo); color: #32292F; border: 0;
+    box-shadow: 0 0 0 4px rgba(153, 225, 217, .25);
+  }
+  .touch .scan.on { color: #32292F; box-shadow: 0 0 0 8px rgba(153, 225, 217, .35); }
+  .touch .fs { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); font-size: 12px; padding: 6px 12px; }
+  .touch-only { display: none; }
+  @media (pointer: coarse) { .touch-only { display: block; } .desk-only { display: none; } }
+  .rotate { display: none; color: var(--muted); text-align: center; font-size: 12px; padding: 8px 0 0; }
+
+  @media (pointer: coarse) {
+    canvas#view { touch-action: none; }
+    .touch { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px; padding: 12px 10px 10px; }
+    .touch .fs { position: static; transform: none; order: -1; flex-basis: 100%; }
+    .app > header .sub { display: none; }
+    h1 small { display: block; margin: 6px 0 0; }
+    .touch .joywrap { display: grid; gap: 8px; justify-items: center; }
+    .rotate { display: block; }
+  }
+  /* phone held upright: controls sit in a panel under the view */
+  @media (pointer: coarse) and (orientation: portrait) {
+    .touch {
+      display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 14px;
+      grid-template-areas: "fs fs" "joy scan" "small small";
+    }
+    .touch .fs { grid-area: fs; }
+    .touch .joywrap { grid-area: joy; justify-items: start; }
+    .touch .right { display: contents; }
+    .touch .scan { grid-area: scan; }
+    .touch .small { grid-area: small; grid-auto-flow: column; }
+  }
+  /* phone held sideways: the view fills the screen and the controls float on top of it */
+  @media (pointer: coarse) and (orientation: landscape) {
+    body { padding: 0; }
+    .app > header { display: none; }
+    .main { grid-template-columns: 1fr; }
+    .main > div:first-child { min-height: 100dvh; }
+    .stage { height: 100dvh; border-radius: 0; border: 0; }
+    canvas#view { width: 100%; height: 100%; aspect-ratio: auto; object-fit: contain; }
+    .touch { position: absolute; inset: 0; padding: 12px 18px; pointer-events: none; }
+    .touch > * { pointer-events: auto; }
+    .touch .fs { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); }
+    .rotate { display: none; }
+  }
+  :fullscreen .stage, .stage:fullscreen { height: 100dvh; }
 </style>
 
 </head>
 <body>
 <div class="app">
   <header>
-    <h1>Echo <span>Room</span></h1>
+    <h1>Echo <span>Room</span><small>ECHO-FLY PROTOTYPE</small></h1>
     <div class="sub">3D laser sonar · walls invisible · mouse to look · <kbd>E</kbd> or click to scan (hold to keep scanning) · <kbd>Space</kbd>/<kbd>Shift</kbd> fly</div>
   </header>
 
@@ -140,22 +202,29 @@
       <div class="stage" id="stage">
         <canvas id="view" tabindex="0" aria-label="First-person sonar view with minimap. Click to look with the mouse. E to scan, arrow keys to move and turn, Space and Shift to fly."></canvas>
         <div class="hud" id="hud"></div>
+        <div class="touch" id="touch">
+          <div class="joywrap">
+            <div class="joy" id="joy" aria-label="Walk: drag to move"><i id="knob"></i></div>
+          </div>
+          <button class="fs" id="fsBtn" aria-label="Full screen">Full screen</button>
+          <div class="right">
+            <div class="small">
+              <button data-k="up" aria-label="Fly up">Up</button>
+              <button data-k="down" aria-label="Fly down">Down</button>
+              <button id="mapBtn" aria-label="Big map">Map</button>
+            </div>
+            <button class="scan" data-k="ping" aria-label="Scan">Scan</button>
+          </div>
+        </div>
         <div class="overlay" id="overlay">
           <div class="box">
             <button class="big" id="startBtn">Start sonar</button>
-            <p>Click the view to look around with the mouse (Esc gives the mouse back). <kbd>E</kbd> or left-click fires a burst of lasers all around you; hold to keep scanning. Every hit lights up briefly, coloured by what it hit, then leaves a fading afterglow. Tab opens a big map.</p>
+            <p class="desk-only">Click the view to look around with the mouse (Esc gives the mouse back). <kbd>E</kbd> or left-click fires a burst of lasers all around you; hold to keep scanning. Every hit lights up briefly, coloured by what it hit, then leaves a fading afterglow. Tab opens a big map.</p>
+            <p class="touch-only">Drag on the view to look around, use the left stick to walk, and hold <b>SCAN</b> to fire the lasers.</p>
           </div>
         </div>
       </div>
-      <div class="pad" id="pad" style="margin-top:12px">
-        <button data-k="left" aria-label="Turn left">⟲ Turn</button>
-        <button data-k="fwd" aria-label="Forward">▲ Fwd</button>
-        <button data-k="right" aria-label="Turn right">Turn ⟳</button>
-        <button data-k="up" aria-label="Fly up">⤒ Up</button>
-        <button data-k="back" aria-label="Back">▼ Back</button>
-        <button data-k="down" aria-label="Fly down">⤓ Down</button>
-        <button class="ping" data-k="ping">SCAN</button>
-      </div>
+      <p class="rotate">Tip: turn your phone sideways for a full-screen view.</p>
     </div>
 
     <aside>
@@ -163,12 +232,12 @@
         <h2>Last scan</h2>
         <div class="reads" id="reads"></div>
         <div class="legend">
-          <span><i style="background:#d6e2ec"></i>wall</span>
-          <span><i style="background:#7ee0a0"></i>room</span>
-          <span><i style="background:#58c8ff"></i>door</span>
-          <span><i style="background:#ff7a6b"></i>obstacle</span>
-          <span><i style="background:#8f86d9"></i>floor</span>
-          <span><i style="background:#c9a8ff"></i>roof</span>
+          <span><i style="background:#99E1D9"></i>wall</span>
+          <span><i style="background:#BEF2A0"></i>room</span>
+          <span><i style="background:#78AAFF"></i>door</span>
+          <span><i style="background:#FF8FA3"></i>obstacle</span>
+          <span><i style="background:#9678AA"></i>floor</span>
+          <span><i style="background:#CDAADC"></i>roof</span>
         </div>
       </section>
 
@@ -258,7 +327,7 @@
   const HGT = [0, CEIL, 0.8, 2.1, CEIL];
   const KIND = [null, "wall", "obst", "door", "room"];
   const NAME = { wall: "wall", room: "room wall", obst: "obstacle", door: "door", floor: "floor", ceil: "roof" };
-  const RGB = { wall: [214, 226, 236], room: [126, 224, 160], door: [88, 200, 255], obst: [255, 122, 107], floor: [143, 134, 217], ceil: [201, 168, 255] };
+  const RGB = { wall: [153, 225, 217], room: [190, 242, 160], door: [120, 170, 255], obst: [255, 143, 163], floor: [150, 120, 170], ceil: [205, 170, 220] };
   const BODY_DN = 1.6, BODY_UP = 0.15;
   const DEFAULT_PITCH = 0;
   const FOVH = 80 * Math.PI / 180;
@@ -276,6 +345,9 @@
     lasers: 6000, coverage: "all", thick: 2, reveal: 0.75, glow: 6, colorBy: "surface", speed: 20, range: 25, mode: "sim", sens: 5, ppm: 50,
     echoSound: false, prox: false, speak: false, steps: true, showMap: false, history: true, vbeams: true,
   };
+  // phones get a lighter default scan; saved settings still win
+  const TOUCH = matchMedia("(pointer: coarse)").matches;
+  if (TOUCH) S.lasers = 3000;
   try { Object.assign(S, JSON.parse(localStorage.getItem("echoRoom8") || "{}")); } catch (e) {}
   S.showMap = false;
   const save = () => { try { localStorage.setItem("echoRoom8", JSON.stringify(S)); } catch (e) {} };
@@ -710,7 +782,7 @@
 
   function renderReads() {
     const s = lastReading, box = $("reads");
-    if (!s) { box.innerHTML = `<div class="kv"><span class="lab">—</span><span class="v">Press E to scan</span></div>`; return; }
+    if (!s) { box.innerHTML = `<div class="kv"><span class="lab">—</span><span class="v">${TOUCH ? "Hold Scan to scan" : "Press E to scan"}</span></div>`; return; }
     const row = (lab, L, extra = "") => `<div class="kv"><span class="lab">${lab}</span><span class="v">${
       L && L.hit ? L.d.toFixed(2) + " m<small>" + NAME[L.kind] + extra + "</small>" : "clear"}</span></div>`;
     let h = row("Ahead", s.center);
@@ -777,13 +849,56 @@
   });
   window.addEventListener("blur", () => { keys.clear(); scanning = false; });
 
-  document.querySelectorAll("#pad button").forEach(b => {
+  // ---------- touch controls ----------
+  document.querySelectorAll("#touch button[data-k]").forEach(b => {
     const k = b.dataset.k;
-    const down = e => { e.preventDefault(); if (!started) begin(); if (k === "ping") { fire(); scanning = true; } else keys.add(k); };
-    const up = () => { if (k === "ping") scanning = false; keys.delete(k); };
+    const down = e => {
+      e.preventDefault(); e.stopPropagation(); if (!started) begin();
+      b.classList.add("on"); if (k === "ping") { fire(); scanning = true; } else keys.add(k);
+    };
+    const up = () => { b.classList.remove("on"); if (k === "ping") scanning = false; keys.delete(k); };
     b.addEventListener("pointerdown", down);
     b.addEventListener("pointerup", up); b.addEventListener("pointerleave", up); b.addEventListener("pointercancel", up);
   });
+  $("mapBtn").addEventListener("pointerdown", e => {
+    e.preventDefault(); e.stopPropagation(); bigMap = !bigMap; $("mapBtn").classList.toggle("on", bigMap);
+  });
+  $("fsBtn").addEventListener("click", async () => {
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else {
+        await document.documentElement.requestFullscreen();
+        if (screen.orientation && screen.orientation.lock) await screen.orientation.lock("landscape").catch(() => {});
+      }
+    } catch (err) {}
+  });
+  document.addEventListener("fullscreenchange", () => { $("fsBtn").textContent = document.fullscreenElement ? "Exit full screen" : "Full screen"; });
+  if (!document.fullscreenEnabled) $("fsBtn").hidden = true;
+
+  // left stick: analog walk (up/down) and side-step (left/right)
+  const joy = { f: 0, s: 0, id: null };
+  (() => {
+    const el = $("joy"), knob = $("knob");
+    const set = e => {
+      const r = el.getBoundingClientRect(), R = r.width / 2;
+      let dx = e.clientX - (r.left + R), dy = e.clientY - (r.top + R);
+      const len = Math.hypot(dx, dy), max = R - 10;
+      if (len > max) { dx *= max / len; dy *= max / len; }
+      knob.style.transform = `translate(${dx}px, ${dy}px)`;
+      const dead = 0.15, nx = dx / max, ny = dy / max;
+      joy.s = Math.abs(nx) > dead ? nx : 0; joy.f = Math.abs(ny) > dead ? -ny : 0;
+    };
+    const end = e => {
+      if (e.pointerId !== joy.id) return;
+      joy.id = null; joy.f = joy.s = 0; knob.style.transform = "";
+    };
+    el.addEventListener("pointerdown", e => {
+      e.preventDefault(); e.stopPropagation(); if (!started) begin();
+      joy.id = e.pointerId; el.setPointerCapture(e.pointerId); set(e);
+    });
+    el.addEventListener("pointermove", e => { if (e.pointerId === joy.id) set(e); });
+    el.addEventListener("pointerup", end); el.addEventListener("pointercancel", end);
+  })();
 
   const locked = () => document.pointerLockElement === view;
   let lookAcc = 0;
@@ -801,31 +916,37 @@
   });
   document.addEventListener("mousemove", e => { if (locked()) look(e.movementX || 0, e.movementY || 0); });
   function toCanvas(e) {
+    // the canvas may be letterboxed (object-fit: contain) on phones, so map through the drawn area
     const rect = view.getBoundingClientRect();
-    return { x: (e.clientX - rect.left) / rect.width * VW, y: (e.clientY - rect.top) / rect.height * VH };
+    const k = Math.min(rect.width / VW, rect.height / VH);
+    const ox = rect.left + (rect.width - VW * k) / 2, oy = rect.top + (rect.height - VH * k) / 2;
+    return { x: (e.clientX - ox) / k, y: (e.clientY - oy) / k };
   }
   const inMini = c => c.x >= miniRect.x && c.y >= miniRect.y && c.x <= miniRect.x + miniRect.w && c.y <= miniRect.y + miniRect.h;
   let drag = null;
   view.addEventListener("pointerdown", e => {
     if (!started) return;
     if (locked()) { if (e.button === 0) { fire(); scanning = true; } return; }
-    drag = { x: e.clientX, y: e.clientY, moved: 0 };
+    if (drag) return; // already looking with another finger
+    drag = { id: e.pointerId, touch: e.pointerType !== "mouse", x: e.clientX, y: e.clientY, moved: 0 };
   });
   window.addEventListener("pointermove", e => {
-    if (!drag || locked()) return;
+    if (!drag || locked() || e.pointerId !== drag.id) return;
     const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
     drag.x = e.clientX; drag.y = e.clientY; drag.moved += Math.abs(dx) + Math.abs(dy);
     look(dx * 2, dy * 2);
   });
   window.addEventListener("pointerup", e => {
     if (locked()) { if (e.button === 0) scanning = false; return; }
-    if (!drag) return;
-    const wasDrag = drag.moved > 4; drag = null;
+    if (!drag || e.pointerId !== drag.id) return;
+    const wasDrag = drag.moved > 4, touch = drag.touch; drag = null;
     if (wasDrag || !started) return;
     const c = toCanvas(e);
     if (inMini(c)) { placeAt(c); return; }
+    if (touch) return; // no pointer lock on phones: dragging is how you look
     try { const p = view.requestPointerLock(); if (p && p.catch) p.catch(() => {}); } catch (err) {}
   });
+  window.addEventListener("pointercancel", e => { if (drag && e.pointerId === drag.id) drag = null; });
   function placeAt(c) {
     const m = miniRect;
     const x = crop.x + (c.x - m.x) / m.w * crop.w, y = crop.y + (c.y - m.y) / m.h * crop.h;
@@ -837,7 +958,9 @@
   function begin() {
     started = true; initAudio();
     $("overlay").hidden = true; view.focus();
-    announce("Sonar ready. Click the view to look with the mouse. Press E to scan.");
+    announce(TOUCH
+      ? "Sonar ready. Drag on the view to look, use the stick to walk, hold Scan to fire."
+      : "Sonar ready. Click the view to look with the mouse. Press E to scan.");
   }
   $("startBtn").addEventListener("click", begin);
 
@@ -903,8 +1026,10 @@
     if (keys.has("back")) f -= 1;
     if (keys.has("sl")) s -= 1;
     if (keys.has("sr")) s += 1;
+    f += joy.f; s += joy.s;
     if (f || s) {
-      const speed = 1.4 * S.ppm * dt, len = Math.hypot(f, s);
+      // keys are normalised to full speed; the touch stick can go slower than that
+      const speed = 1.4 * S.ppm * dt, len = Math.max(1, Math.hypot(f, s));
       const mx = (Math.cos(P.a) * f - Math.sin(P.a) * s) / len * speed;
       const my = (Math.sin(P.a) * f + Math.cos(P.a) * s) / len * speed;
       let moved = 0, blocked = false;
@@ -922,8 +1047,8 @@
   }
 
   // ---------- colours & sprites ----------
-  // distance ramp: near = hot red/orange, mid = yellow/green, far = cyan/blue
-  const RAMP = [[255, 70, 60], [255, 150, 60], [245, 220, 90], [120, 230, 140], [70, 200, 255], [80, 110, 255]];
+  // distance ramp: near = coral, mid = peach/turquoise, far = blue/violet
+  const RAMP = [[255, 110, 130], [255, 170, 140], [245, 215, 160], [153, 225, 217], [110, 180, 230], [120, 120, 220]];
   function rampAt(t) {
     t = Math.max(0, Math.min(0.9999, t)) * (RAMP.length - 1);
     const i = Math.floor(t), f = t - i, a = RAMP[i], b = RAMP[i + 1];
@@ -996,11 +1121,11 @@
   function drawMap(now) {
     if (hist.width !== W) { hist.width = W; hist.height = H; }
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.fillStyle = "#05080b"; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "#140F13"; ctx.fillRect(0, 0, W, H);
     if (S.showMap) { ctx.globalAlpha = 0.45; ctx.drawImage(wallCanvas, 0, 0); ctx.globalAlpha = 1; }
     if (S.history) ctx.drawImage(hist, 0, 0);
     if (trail.length > 1) {
-      ctx.strokeStyle = "rgba(255,181,71,.4)"; ctx.lineWidth = 3; ctx.lineJoin = "round"; ctx.setLineDash([2, 8]);
+      ctx.strokeStyle = "rgba(247,197,159,.4)"; ctx.lineWidth = 3; ctx.lineJoin = "round"; ctx.setLineDash([2, 8]);
       ctx.beginPath(); ctx.moveTo(trail[0].x, trail[0].y);
       for (const q of trail) ctx.lineTo(q.x, q.y);
       ctx.lineTo(P.x, P.y); ctx.stroke(); ctx.setLineDash([]);
@@ -1037,20 +1162,20 @@
     for (const w of waves) {
       const r = (now - w.t) / 1000 * S.speed / 2 * S.ppm, a = 1 - r / ((S.range + 1) * S.ppm);
       if (r <= 0) continue;
-      ctx.strokeStyle = `rgba(88,208,255,${0.5 * a})`; ctx.lineWidth = 3;
+      ctx.strokeStyle = `rgba(153,225,217,${0.5 * a})`; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.arc(w.x, w.y, r, 0, Math.PI * 2); ctx.stroke();
     }
-    ctx.fillStyle = "rgba(255,181,71,.14)";
+    ctx.fillStyle = "rgba(247,197,159,.14)";
     ctx.beginPath();
     if (S.coverage !== "all") { ctx.moveTo(P.x, P.y); ctx.arc(P.x, P.y, 90, P.a - FOVH / 2, P.a + FOVH / 2); ctx.closePath(); }
     else ctx.arc(P.x, P.y, 60, 0, Math.PI * 2);
     ctx.fill();
     // view direction wedge (always), so you can see where you are looking
-    ctx.fillStyle = "rgba(255,181,71,.28)";
+    ctx.fillStyle = "rgba(247,197,159,.28)";
     ctx.beginPath(); ctx.moveTo(P.x, P.y); ctx.arc(P.x, P.y, 46, P.a - FOVH / 2, P.a + FOVH / 2); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = "#ffb547";
+    ctx.fillStyle = "#F7C59F";
     ctx.beginPath(); ctx.arc(P.x, P.y, 11, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = "#05080b"; ctx.lineWidth = 3;
+    ctx.strokeStyle = "#140F13"; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.moveTo(P.x, P.y); ctx.lineTo(P.x + Math.cos(P.a) * 11, P.y + Math.sin(P.a) * 11); ctx.stroke();
   }
 
@@ -1063,15 +1188,15 @@
     const hor = VH / 2 + Math.tan(P.pitch) * FOCAL + CAM.bob;   // where the horizon sits on screen
 
     g.globalAlpha = 1; g.globalCompositeOperation = "source-over";
-    g.fillStyle = "#05080b"; g.fillRect(0, 0, VW, VH);
+    g.fillStyle = "#140F13"; g.fillRect(0, 0, VW, VH);
     if (hor < VH) {
       const fl = g.createLinearGradient(0, hor, 0, VH + 200);
-      fl.addColorStop(0, "rgba(88,208,255,0)"); fl.addColorStop(1, "rgba(88,208,255,.07)");
+      fl.addColorStop(0, "rgba(153,225,217,0)"); fl.addColorStop(1, "rgba(153,225,217,.07)");
       g.fillStyle = fl; g.fillRect(0, Math.max(0, hor), VW, VH);
     }
     if (hor > 0) {
       const cg = g.createLinearGradient(0, hor, 0, -200);
-      cg.addColorStop(0, "rgba(169,156,255,0)"); cg.addColorStop(1, "rgba(169,156,255,.05)");
+      cg.addColorStop(0, "rgba(205,170,220,0)"); cg.addColorStop(1, "rgba(205,170,220,.05)");
       g.fillStyle = cg; g.fillRect(0, 0, VW, Math.min(VH, hor));
     }
 
@@ -1125,7 +1250,7 @@
     for (const w of waves) {
       const r = (now - w.t) / 1000 * S.speed / 2, a = 1 - r / (S.range + 1);
       if (r < 0.3) continue;
-      g.strokeStyle = `rgba(88,208,255,${0.35 * a})`; g.lineWidth = 2;
+      g.strokeStyle = `rgba(153,225,217,${0.35 * a})`; g.lineWidth = 2;
       g.beginPath();
       let pen = false;
       for (let k = 0; k <= 72; k++) {
@@ -1159,19 +1284,19 @@
     if (centre) {
       const { L, k } = centre, a = fadeOf(k), p = project(L.hx, L.hy, L.hz);
       if (p) {
-        g.fillStyle = `rgba(255,91,74,${a})`; g.beginPath(); g.arc(p.x, p.y, 4, 0, Math.PI * 2); g.fill();
+        g.fillStyle = `rgba(255,143,163,${a})`; g.beginPath(); g.arc(p.x, p.y, 4, 0, Math.PI * 2); g.fill();
         const pop = Math.min(1, k / 0.25);
-        g.strokeStyle = `rgba(255,91,74,${(1 - pop) * a})`; g.lineWidth = 2;
+        g.strokeStyle = `rgba(255,143,163,${(1 - pop) * a})`; g.lineWidth = 2;
         g.beginPath(); g.arc(p.x, p.y, 6 + pop * 24, 0, Math.PI * 2); g.stroke();
       }
       g.textAlign = "center";
-      g.font = "600 18px 'IBM Plex Mono', monospace"; g.fillStyle = `rgba(223,231,238,${a})`;
+      g.font = "600 18px 'Saira', sans-serif"; g.fillStyle = `rgba(244,241,243,${a})`;
       g.fillText(L.d.toFixed(2) + " m", VW / 2, cy + 44);
-      g.font = "400 12px 'IBM Plex Mono', monospace"; g.fillStyle = `rgba(${RGB[L.kind]},${a})`;
+      g.font = "400 12px 'Saira', sans-serif"; g.fillStyle = `rgba(${RGB[L.kind]},${a})`;
       g.fillText(NAME[L.kind], VW / 2, cy + 62);
       g.textAlign = "start";
     }
-    g.strokeStyle = "rgba(223,231,238,.35)"; g.lineWidth = 1.5;
+    g.strokeStyle = "rgba(244,241,243,.35)"; g.lineWidth = 1.5;
     g.beginPath(); g.moveTo(VW / 2 - 10, cy); g.lineTo(VW / 2 - 3, cy); g.moveTo(VW / 2 + 3, cy); g.lineTo(VW / 2 + 10, cy);
     g.moveTo(VW / 2, cy - 10); g.lineTo(VW / 2, cy - 3); g.moveTo(VW / 2, cy + 3); g.lineTo(VW / 2, cy + 10); g.stroke();
 
@@ -1179,13 +1304,13 @@
     drawCompass();
     drawRadar(now);
     if (scanPending || (scanning && started)) {
-      g.fillStyle = "rgba(88,208,255,.9)"; g.font = "600 11px 'IBM Plex Mono', monospace";
+      g.fillStyle = "rgba(153,225,217,.9)"; g.font = "600 11px 'Saira', sans-serif";
       g.fillText(scanning ? "● SCANNING" : "● SCAN", VW - 118, VH - 18);
     }
     if (!locked()) {
-      g.font = "400 13px 'IBM Plex Mono', monospace"; g.textAlign = "center";
-      g.fillStyle = "rgba(127,142,156,.9)";
-      g.fillText("Click the view to look around with the mouse · drag also works · Tab = big map", VW / 2, VH - 18);
+      g.font = "400 13px 'Saira', sans-serif"; g.textAlign = "center";
+      g.fillStyle = "rgba(185,174,181,.9)";
+      g.fillText(TOUCH ? "Drag the view to look around · stick to walk · hold Scan" : "Click the view to look around with the mouse · drag also works · Tab = big map", VW / 2, VH - 18);
       g.textAlign = "start";
     }
   }
@@ -1194,7 +1319,7 @@
   function drawRadar(now) {
     if (!radar) return;
     const g = vctx, cx = 86, cy = VH - 86, R0 = 30, R1 = 64, SECT = radar.best.length, w = 2 * Math.PI / SECT;
-    g.fillStyle = "rgba(5,8,11,.7)"; g.beginPath(); g.arc(cx, cy, R1 + 12, 0, Math.PI * 2); g.fill();
+    g.fillStyle = "rgba(20,15,19,.7)"; g.beginPath(); g.arc(cx, cy, R1 + 12, 0, Math.PI * 2); g.fill();
     for (let j = 0; j < SECT; j++) {
       const d = radar.best[j]; if (d === Infinity) continue;
       const abs = -Math.PI + (j + 0.5) * w, rel = wrapA(abs - P.a), sa = -Math.PI / 2 + rel;
@@ -1202,35 +1327,35 @@
       g.strokeStyle = `rgba(${col},${0.95 - t * 0.55})`; g.lineWidth = (R1 - R0) * (1 - t * 0.7);
       g.beginPath(); g.arc(cx, cy, (R0 + R1) / 2, sa - w / 2 + 0.01, sa + w / 2 - 0.01); g.stroke();
     }
-    g.fillStyle = "#ffb547"; g.beginPath(); g.moveTo(cx, cy - 9); g.lineTo(cx - 6, cy + 6); g.lineTo(cx + 6, cy + 6); g.closePath(); g.fill();
-    g.fillStyle = "rgba(127,142,156,.9)"; g.font = "400 10px 'IBM Plex Mono', monospace"; g.textAlign = "center";
+    g.fillStyle = "#F7C59F"; g.beginPath(); g.moveTo(cx, cy - 9); g.lineTo(cx - 6, cy + 6); g.lineTo(cx + 6, cy + 6); g.closePath(); g.fill();
+    g.fillStyle = "rgba(185,174,181,.9)"; g.font = "400 10px 'Saira', sans-serif"; g.textAlign = "center";
     g.fillText("CLOSE BY · last scan", cx, cy + R1 + 24); g.textAlign = "start";
   }
 
   function drawCompass() {
     const g = vctx, w = 420, x0 = VW / 2 - w / 2, y = 22, deg = P.a * 180 / Math.PI + 90;
-    g.fillStyle = "rgba(5,8,11,.6)"; g.fillRect(x0, y - 14, w, 30);
+    g.fillStyle = "rgba(20,15,19,.6)"; g.fillRect(x0, y - 14, w, 30);
     g.save(); g.beginPath(); g.rect(x0, y - 14, w, 30); g.clip();
-    g.font = "600 11px 'IBM Plex Mono', monospace"; g.textAlign = "center";
+    g.font = "600 11px 'Saira', sans-serif"; g.textAlign = "center";
     const names = { 0: "N", 90: "E", 180: "S", 270: "W" };
     for (let d = Math.floor((deg - 60) / 15) * 15; d <= deg + 60; d += 15) {
       const x = VW / 2 + (d - deg) / 60 * (w / 2), n = ((d % 360) + 360) % 360;
-      g.fillStyle = names[n] !== undefined ? "rgba(255,181,71,.95)" : "rgba(127,142,156,.8)";
+      g.fillStyle = names[n] !== undefined ? "rgba(247,197,159,.95)" : "rgba(185,174,181,.8)";
       g.fillRect(x - 0.5, y + 6, 1, n % 45 ? 5 : 9);
       g.fillText(names[n] !== undefined ? names[n] : (n % 45 ? "" : n), x, y + 2);
     }
     g.restore();
-    g.fillStyle = "#ffb547"; g.beginPath(); g.moveTo(VW / 2, y + 12); g.lineTo(VW / 2 - 5, y + 18); g.lineTo(VW / 2 + 5, y + 18); g.closePath(); g.fill();
+    g.fillStyle = "#F7C59F"; g.beginPath(); g.moveTo(VW / 2, y + 12); g.lineTo(VW / 2 - 5, y + 18); g.lineTo(VW / 2 + 5, y + 18); g.closePath(); g.fill();
     g.textAlign = "start";
   }
 
   function drawAltimeter(now) {
     const g = vctx, x = VW - 54, top = 150, bot = VH - 150, hgt = bot - top;
     const yOf = z => bot - z / CEIL * hgt;
-    g.fillStyle = "rgba(5,8,11,.7)"; g.fillRect(x - 30, top - 34, 76, hgt + 64);
-    g.strokeStyle = "rgba(127,142,156,.5)"; g.lineWidth = 1;
+    g.fillStyle = "rgba(20,15,19,.7)"; g.fillRect(x - 30, top - 34, 76, hgt + 64);
+    g.strokeStyle = "rgba(185,174,181,.5)"; g.lineWidth = 1;
     g.beginPath(); g.moveTo(x, top); g.lineTo(x, bot); g.stroke();
-    g.font = "400 10px 'IBM Plex Mono', monospace"; g.fillStyle = "rgba(127,142,156,.9)"; g.textAlign = "right";
+    g.font = "400 10px 'Saira', sans-serif"; g.fillStyle = "rgba(185,174,181,.9)"; g.textAlign = "right";
     for (let m = 0; m <= CEIL; m++) {
       g.beginPath(); g.moveTo(x - 5, yOf(m)); g.lineTo(x + 5, yOf(m)); g.stroke();
       g.fillText(m + "", x - 9, yOf(m) + 3);
@@ -1246,8 +1371,8 @@
       g.fillText(L.d.toFixed(1) + " m", x + 8, L.vertical < 0 ? y + 16 : y - 8);
     }
     const ey = yOf(P.z), fyy = yOf(P.z - BODY_DN);
-    g.fillStyle = "rgba(255,181,71,.35)"; g.fillRect(x + 8, ey, 4, fyy - ey);
-    g.fillStyle = "#ffb547";
+    g.fillStyle = "rgba(247,197,159,.35)"; g.fillRect(x + 8, ey, 4, fyy - ey);
+    g.fillStyle = "#F7C59F";
     g.beginPath(); g.moveTo(x + 6, ey); g.lineTo(x + 16, ey - 6); g.lineTo(x + 16, ey + 6); g.closePath(); g.fill();
     g.textAlign = "start";
   }
@@ -1257,20 +1382,20 @@
     const sc = Math.min(maxW / crop.w, maxH / crop.h);
     const w = crop.w * sc, h = crop.h * sc;
     const m = miniRect = bigMap ? { x: (VW - w) / 2, y: (VH - h) / 2, w, h } : { x: 16, y: 16, w, h };
-    if (bigMap) { g.fillStyle = "rgba(5,8,11,.75)"; g.fillRect(0, 0, VW, VH); }
-    g.fillStyle = "rgba(5,8,11,.9)"; g.fillRect(m.x - 1, m.y - 1, m.w + 2, m.h + 2);
+    if (bigMap) { g.fillStyle = "rgba(20,15,19,.75)"; g.fillRect(0, 0, VW, VH); }
+    g.fillStyle = "rgba(20,15,19,.9)"; g.fillRect(m.x - 1, m.y - 1, m.w + 2, m.h + 2);
     g.drawImage(mini, crop.x, crop.y, crop.w, crop.h, m.x, m.y, m.w, m.h);
-    g.strokeStyle = "rgba(88,208,255,.45)"; g.lineWidth = 1.5; g.strokeRect(m.x - 1, m.y - 1, m.w + 2, m.h + 2);
-    g.fillStyle = "rgba(127,142,156,.9)"; g.font = "600 11px 'IBM Plex Mono', monospace";
+    g.strokeStyle = "rgba(153,225,217,.45)"; g.lineWidth = 1.5; g.strokeRect(m.x - 1, m.y - 1, m.w + 2, m.h + 2);
+    g.fillStyle = "rgba(185,174,181,.9)"; g.font = "600 11px 'Saira', sans-serif";
     g.fillText("MAP · 1 m" + (bigMap ? "   (Tab to close)" : ""), m.x + 6, m.y + m.h - 8);
     g.fillRect(m.x + 76, m.y + m.h - 12, S.ppm * sc, 2);
     const feet = P.z - BODY_DN - groundUnder(P.x, P.y);
-    g.fillStyle = "rgba(255,181,71,.95)";
+    g.fillStyle = "rgba(247,197,159,.95)";
     g.fillText(feet > 0.05 ? `flying ${feet.toFixed(1)} m up` : "on the ground", m.x + 6, m.y + 16);
   }
 
   function draw(now) {
-    if (!grid) { vctx.fillStyle = "#05080b"; vctx.fillRect(0, 0, VW, VH); return; }
+    if (!grid) { vctx.fillStyle = "#140F13"; vctx.fillRect(0, 0, VW, VH); return; }
     drawMap(now);
     drawPOV(now);
     drawMinimap();
