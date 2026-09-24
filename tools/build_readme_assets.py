@@ -47,6 +47,7 @@ CONTENTS = [
     ("HOW IT WORKS", "how-it-works"),
     ("FIRST DEMO", "first-demo"),
     ("TEST 2", "test-2"),
+    ("PROTOTYPE", "prototype"),
     ("ROADMAP", "roadmap"),
     ("LIMITATIONS", "limitations"),
     ("TEAM", "team"),
@@ -59,6 +60,7 @@ HEADERS = {
     "how-it-works": "How It Might Work",
     "first-demo": "First Demo: Wall Dodge",
     "test-2": "Test 2: Building Escape",
+    "prototype": "Prototype: Echo Room",
     "roadmap": "Roadmap",
     "limitations": "Limitations",
     "team": "Team",
@@ -107,7 +109,8 @@ class Font:
     """One static weight of Saira, subset to the characters we use."""
 
     def __init__(self, var_font: bytes, weight: int):
-        font = TTFont(io.BytesIO(var_font))
+        # fixed timestamps so re-running the script gives byte-identical files
+        font = TTFont(io.BytesIO(var_font), recalcTimestamp=False)
         instantiateVariableFont(font, {"wght": weight, "wdth": 100}, inplace=True)
         self.font = font
         self.weight = weight
@@ -123,7 +126,7 @@ class Font:
         return total * size / self.upm + spacing * max(len(text) - 1, 0)
 
     def woff2_b64(self, text: str) -> str:
-        font = TTFont(io.BytesIO(self._bytes()))
+        font = TTFont(io.BytesIO(self._bytes()), recalcTimestamp=False)
         opts = Options()
         opts.flavor = "woff2"
         opts.layout_features = ["kern", "liga"]

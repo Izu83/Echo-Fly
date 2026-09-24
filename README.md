@@ -36,6 +36,7 @@
   <a href="#how-it-works"><img src="assets/readme/btn-how-it-works.svg" alt="How It Works" height="40"></a>
   <a href="#first-demo"><img src="assets/readme/btn-first-demo.svg" alt="First Demo" height="40"></a>
   <a href="#test-2"><img src="assets/readme/btn-test-2.svg" alt="Test 2" height="40"></a>
+  <a href="#prototype"><img src="assets/readme/btn-prototype.svg" alt="Prototype" height="40"></a>
   <a href="#roadmap"><img src="assets/readme/btn-roadmap.svg" alt="Roadmap" height="40"></a>
   <a href="#limitations"><img src="assets/readme/btn-limitations.svg" alt="Limitations" height="40"></a>
   <a href="#team"><img src="assets/readme/btn-team.svg" alt="Team" height="40"></a>
@@ -118,12 +119,30 @@ Only if the first demo goes somewhere. The fly is placed **blind inside a buildi
 - We'd compare the connectome-driven fly against a **randomly moving fly** to see if the real brain wiring helps at all.
 - Stretch goal, *if* there's time: move from 2D to a 3D fly body using **NeuroMechFly / FlyGym**.
 
+<a name="prototype"></a>
+<img src="assets/readme/h-prototype.svg" alt="Prototype: Echo Room" height="56">
+
+> [!NOTE]
+> **Very early prototype.** This is a first experiment with the echolocator only. It is **not connected to the fly brain** yet, and it will probably change a lot or get rewritten.
+
+[`RayCastV1/`](RayCastV1/) is **Echo Room**, a first-person sonar you can play in the browser. The walls are invisible. Every scan fires thousands of rays, and a spot only lights up briefly when its echo comes back. It's a rough idea of what the world might "look like" to our blind fly in **Test 2**.
+
+<p align="center">
+  <img src="RayCastV1/map.png" alt="Echo Room level map" width="70%">
+</p>
+<p align="center"><sub>The level: black = walls (4 m), green = room walls, blue = door, red = low obstacles (0.8 m).</sub></p>
+
+**Try it:** download the repo and open [`RayCastV1/index.html`](RayCastV1/index.html) in a browser. There's nothing to install. Click the view, look around with the mouse, hold **E** (or left click) to scan, walk with **W A S D**, and press **Tab** for the map. The full controls are in [`RayCastV1/README.md`](RayCastV1/README.md).
+
+**What might come next:** right now a human is driving. The idea is to eventually swap the human for the fly brain, turning echoes into sensory-neuron input and letting the fly's motor neurons do the walking and turning. That's still a big "if".
+
 <a name="roadmap"></a>
 <img src="assets/readme/h-roadmap.svg" alt="Roadmap" height="56">
 
 - [x] Pick an idea we're excited about
 - [x] Plan the two tests
 - [ ] Get an existing whole-brain fly model running and reproduce one of its published results
+- [x] First echolocator prototype ([Echo Room](#prototype), human-controlled for now)
 - [ ] Build the wall + sonar simulation
 - [ ] Connect them for a single wall / single trial
 - [ ] Run many trials + the swapped-wire control
