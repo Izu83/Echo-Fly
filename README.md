@@ -128,9 +128,46 @@ Only if the first demo goes somewhere. The fly is placed **blind inside a buildi
 [`RayCastV1/`](RayCastV1/) is **Echo Room**, a first-person sonar you can play in the browser. The walls are invisible. Every scan fires thousands of rays, and a spot only lights up briefly when its echo comes back. It's a rough idea of what the world might "look like" to our blind fly in **Test 2**.
 
 <p align="center">
-  <img src="RayCastV1/map.png" alt="Echo Room level map" width="70%">
+  <img src="assets/readme/demo/ping.gif" alt="One sonar ping: hits light up as their echoes come back, near ones first" width="90%">
 </p>
-<p align="center"><sub>The level: black = walls (4 m), green = room walls, blue = door, red = low obstacles (0.8 m).</sub></p>
+<p align="center"><sub><b>One ping.</b> Nothing is visible until the echoes come back. Near hits light up first, far ones later. (Echo speed turned down so you can see the wave.)</sub></p>
+
+<p align="center">
+  <img src="assets/readme/demo/walk.gif" alt="Scanning non-stop while turning and walking through the room" width="90%">
+</p>
+<p align="center"><sub><b>Scanning while moving.</b> Holding scan, turning, then walking toward a wall. The minimap in the corner fills in with what the sonar has found.</sub></p>
+
+<table>
+  <tr>
+    <td width="50%"><img src="assets/readme/demo/scan.jpg" alt="Scan colored by what it hit"></td>
+    <td width="50%"><img src="assets/readme/demo/distance.jpg" alt="Scan colored by distance"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Colored by <b>what it hit</b>: turquoise = wall, pink = obstacle, green = room wall, purple = floor / roof</sub></td>
+    <td align="center"><sub>Colored by <b>distance</b> (<kbd>C</kbd>): warm = close, turquoise / blue = far</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="assets/readme/demo/map.png" alt="Big map built from sonar hits"></td>
+    <td width="50%"><img src="RayCastV1/map.png" alt="The level map image"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Big map</b> (<kbd>Tab</kbd>): everything the sonar has hit so far, plus the path walked</sub></td>
+    <td align="center"><sub><b>The real level</b>: black = walls (4 m), green = room walls, blue = door, red = low obstacles (0.8 m)</sub></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td width="68%"><img src="assets/readme/demo/phone-landscape.png" alt="Echo Room on a phone held sideways"></td>
+    <td width="32%"><img src="assets/readme/demo/phone-portrait.png" alt="Echo Room on a phone held upright"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Phone, sideways:</b> full screen with the walk stick, Up / Down / Map and Scan on top</sub></td>
+    <td align="center"><sub><b>Phone, upright:</b> controls under the view</sub></td>
+  </tr>
+</table>
+
+<p align="center"><sub>Recorded from the prototype as it is now. It will probably look different later.</sub></p>
 
 **Play it:** [https://izu83.github.io/Echo-Fly/RayCastV1/](https://izu83.github.io/Echo-Fly/RayCastV1/), on a computer or a phone. You can also download the repo and open [`RayCastV1/index.html`](RayCastV1/index.html) directly.
 
