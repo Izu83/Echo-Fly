@@ -1,0 +1,174 @@
+{
+  "max_hops_searched": 6,
+  "sensory_group_sizes": {
+    "johnstons_organ": 672,
+    "looming_lplc": 416
+  },
+  "motor_type_sizes": {
+    "DNa01": 2,
+    "DNa02": 2,
+    "MDN": 4,
+    "DNp09": 2
+  },
+  "hop_distances": {
+    "johnstons_organ": {
+      "DNa01": {
+        "reachable": true,
+        "min_hop": 2,
+        "example_target_bodyId": 10442,
+        "example_path": [
+          859985596,
+          15192,
+          10442
+        ]
+      },
+      "DNa02": {
+        "reachable": true,
+        "min_hop": 2,
+        "example_target_bodyId": 10360,
+        "example_path": [
+          762295104,
+          11610,
+          10360
+        ]
+      },
+      "MDN": {
+        "reachable": true,
+        "min_hop": 2,
+        "example_target_bodyId": 10763,
+        "example_path": [
+          183993,
+          12447,
+          10763
+        ]
+      },
+      "DNp09": {
+        "reachable": true,
+        "min_hop": 2,
+        "example_target_bodyId": 10783,
+        "example_path": [
+          469098413,
+          520401,
+          10783
+        ]
+      }
+    },
+    "looming_lplc": {
+      "DNa01": {
+        "reachable": true,
+        "min_hop": 2,
+        "example_target_bodyId": 10442,
+        "example_path": [
+          23394,
+          11726,
+          10442
+        ]
+      },
+      "DNa02": {
+        "reachable": true,
+        "min_hop": 2,
+        "example_target_bodyId": 10360,
+        "example_path": [
+          18314,
+          529641,
+          10360
+        ]
+      },
+      "MDN": {
+        "reachable": true,
+        "min_hop": 2,
+        "example_target_bodyId": 10763,
+        "example_path": [
+          18365,
+          10070,
+          10763
+        ]
+      },
+      "DNp09": {
+        "reachable": true,
+        "min_hop": 1,
+        "example_target_bodyId": 10783,
+        "example_path": [
+          525844,
+          10783
+        ]
+      }
+    }
+  },
+  "reachability_growth": {
+    "johnstons_organ": [
+      [
+        0,
+        672,
+        672
+      ],
+      [
+        1,
+        3163,
+        3835
+      ],
+      [
+        2,
+        102452,
+        106287
+      ],
+      [
+        3,
+        73991,
+        180278
+      ],
+      [
+        4,
+        4044,
+        184322
+      ],
+      [
+        5,
+        262,
+        184584
+      ],
+      [
+        6,
+        112,
+        184696
+      ]
+    ],
+    "looming_lplc": [
+      [
+        0,
+        416,
+        416
+      ],
+      [
+        1,
+        16748,
+        17164
+      ],
+      [
+        2,
+        111430,
+        128594
+      ],
+      [
+        3,
+        53326,
+        181920
+      ],
+      [
+        4,
+        2402,
+        184322
+      ],
+      [
+        5,
+        191,
+        184513
+      ],
+      [
+        6,
+        113,
+        184626
+      ]
+    ]
+  }
+}

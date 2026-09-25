@@ -1,2 +1,7 @@
 tools/.cache/
 __pycache__/
+
+# BrainTest1: connectome data (~23 GB, download with BrainTest1/download_data.py) and local caches
+BrainTest1/data/
+BrainTest1/**/synapse_points_cache.feather
+*.pyc

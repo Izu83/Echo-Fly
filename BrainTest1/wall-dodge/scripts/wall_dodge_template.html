@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Echo-Fly: Wall Dodge</title>
+<style>
+  :root { --ground:#1E181C; --panel:rgba(50,41,47,.86); --line:#4A3D46; --teal:#99E1D9; --text:#F4F1F3; --muted:#B9AEB5; --red:#FF8FA3; --green:#7be0a0; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; background:var(--ground); color:var(--text); font:13px/1.45 system-ui, "Segoe UI", sans-serif; overflow:hidden; }
+  #stage { position:fixed; inset:0; }
+  canvas { display:block; }
+  .panel { position:fixed; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:10px 12px; backdrop-filter:blur(4px); }
+  h1 { font-size:15px; margin:0 0 2px; letter-spacing:.06em; text-transform:uppercase; color:var(--teal); }
+  h2 { font-size:11px; margin:0 0 6px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:600; }
+  .muted { color:var(--muted); }
+  #left { top:12px; left:12px; width:290px; }
+  #right { top:12px; right:12px; width:250px; }
+  #bottom { bottom:12px; left:50%; transform:translateX(-50%); display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:center; max-width:calc(100% - 24px); }
+  button, select, input[type=range] { font:inherit; color:var(--text); }
+  button, select { background:#251E23; border:1px solid var(--line); border-radius:5px; padding:5px 10px; cursor:pointer; }
+  button:hover, select:hover { border-color:var(--teal); }
+  label.chk { display:flex; gap:5px; align-items:center; cursor:pointer; }
+  .row { display:grid; grid-template-columns:78px 1fr 44px; gap:8px; align-items:center; margin:3px 0; font-variant-numeric:tabular-nums; }
+  .bar { height:8px; background:#251E23; border-radius:3px; overflow:hidden; }
+  .bar i { display:block; height:100%; width:0; background:var(--teal); }
+  .bar.dna i { background:#E9C46A; }
+  .bar.in i { background:var(--red); }
+  .val { text-align:right; }
+  #dots { display:flex; gap:5px; margin:6px 0 2px; flex-wrap:wrap; }
+  #dots span { width:14px; height:14px; border-radius:50%; background:#3a3037; border:2px solid transparent; cursor:pointer; }
+  #dots span.ok { background:var(--green); } #dots span.bad { background:var(--red); }
+  #dots span.cur { border-color:#fff; }
+  #banner { position:fixed; top:38%; left:50%; transform:translate(-50%,-50%); font-size:54px; font-weight:800; letter-spacing:.08em; text-shadow:0 0 24px #000; opacity:0; transition:opacity .2s; pointer-events:none; }
+  #flash { position:fixed; inset:0; background:#ff2d55; opacity:0; pointer-events:none; }
+  table { width:100%; border-collapse:collapse; margin-top:4px; }
+  td { padding:2px 0; } td:last-child { text-align:right; font-variant-numeric:tabular-nums; }
+  tr.sel td { color:var(--teal); font-weight:700; }
+  #mini { display:block; width:100%; height:150px; background:#241D22; border-radius:6px; margin-top:6px; }
+  .note { font-size:11.5px; color:var(--muted); margin-top:8px; }
+  @media (max-width: 900px) { #right { display:none; } #left { width:250px; } }
+</style>
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+               "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+</script>
+</head>
+<body>
+<div id="stage"></div>
+<div id="flash"></div>
+<div id="banner"></div>
+
+<div class="panel" id="left">
+  <h1>Echo-Fly · Wall Dodge</h1>
+  <div class="muted">A fly stays in place. Walls fly at it. Only its brain wiring decides which way to dodge.</div>
+  <div style="margin-top:8px"><select id="mode"></select></div>
+  <div class="muted" id="modeDesc" style="margin-top:6px"></div>
+  <div id="dots"></div>
+  <div class="muted" id="trialInfo"></div>
+  <h2 style="margin-top:10px">What the eyes see (input)</h2>
+  <div class="row"><span>left eye</span><div class="bar in"><i id="inL"></i></div><span class="val" id="inLv"></span></div>
+  <div class="row"><span>right eye</span><div class="bar in"><i id="inR"></i></div><span class="val" id="inRv"></span></div>
+  <h2 style="margin-top:8px">Inside the brain (spikes / s)</h2>
+  <div class="row"><span>looming L</span><div class="bar"><i id="sL"></i></div><span class="val" id="sLv"></span></div>
+  <div class="row"><span>looming R</span><div class="bar"><i id="sR"></i></div><span class="val" id="sRv"></span></div>
+  <div class="row"><span>relays</span><div class="bar"><i id="rel"></i></div><span class="val" id="relv"></span></div>
+  <h2 style="margin-top:8px">Steering neurons (DNa)</h2>
+  <div class="row"><span>DNa left</span><div class="bar dna"><i id="dL"></i></div><span class="val" id="dLv"></span></div>
+  <div class="row"><span>DNa right</span><div class="bar dna"><i id="dR"></i></div><span class="val" id="dRv"></span></div>
+</div>
+
+<div class="panel" id="right">
+  <h2>Top-down view</h2>
+  <canvas id="mini" width="460" height="300"></canvas>
+  <h2 style="margin-top:10px">Result over all test walls</h2>
+  <table id="scores"></table>
+  <div class="note" id="scoreNote"></div>
+</div>
+
+<div class="panel" id="bottom">
+  <button id="play">Pause</button>
+  <button id="prev">&larr; Prev wall</button>
+  <button id="restart">Replay</button>
+  <button id="hide">Hide panels</button>
+  <button id="next">Next wall &rarr;</button>
+  <label class="chk"><input type="checkbox" id="auto" checked> auto-next</label>
+  <label class="chk">speed <input type="range" id="speed" min="0.25" max="2" step="0.25" value="1"><span id="speedv">1x</span></label>
+  <span class="muted">drag = rotate view, wheel = zoom, space = pause, H = hide panels</span>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const DATA = /*__DATA__*/null;
+const MODES = {
+  brain: { label: 'Real connectome wiring', desc: 'The looming neurons of each eye feed the real fly wiring; the difference in left vs right steering-neuron firing steers the fly.' },
+  swapped: { label: 'Control: eyes wired to the opposite side', desc: 'Same brain, but the left eye is plugged into the right side of the brain and vice versa.' },
+  scrambled_eyes: { label: 'Control: eyes scrambled', desc: 'Same brain, but every looming neuron is randomly assigned to the left or right eye.' },
+  random: { label: 'Baseline: no brain, random side', desc: 'No brain at all: the fly just picks left or right at random. This is the chance level.' },
+};
+const CTRL = DATA.control_ms / 1000;
+const P = DATA.params;
+const GAPC_HALF = P.GAP_W / 2;
+const state = { mode: 'brain', trial: 0, t: 0, playing: true, speed: 1, fired: false, hold: 0 };
+
+// ---------- scene ----------
+const stage = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+stage.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1E181C);
+scene.fog = new THREE.Fog(0x1E181C, 45, 120);
+const camera = new THREE.PerspectiveCamera(58, 1, 0.1, 200);
+camera.position.set(0, 3.4, 10);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 0.6, -6);
+controls.enableDamping = true;
+controls.update();
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+const sun = new THREE.DirectionalLight(0xffffff, 1.0); sun.position.set(6, 12, 8); scene.add(sun);
+const fill = new THREE.PointLight(0x99E1D9, 5, 30); fill.position.set(0, 3, -4); scene.add(fill);
+
+const grid = new THREE.GridHelper(120, 120, 0x4A3D46, 0x32292F); grid.position.y = -2.5; scene.add(grid);
+
+function makeFly() {
+  const g = new THREE.Group();
+  const mat = (c, extra = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.55, metalness: 0.05, ...extra });
+  const ell = (rx, ry, rz, m, x = 0, y = 0, z = 0) => {
+    const mesh = new THREE.Mesh(new THREE.SphereGeometry(1, 28, 20), m);
+    mesh.scale.set(rx, ry, rz); mesh.position.set(x, y, z); g.add(mesh); return mesh;
+  };
+  ell(0.30, 0.27, 0.36, mat(0x7a4b22));
+  ell(0.26, 0.24, 0.50, mat(0xc98a3d), 0, -0.03, 0.62);
+  for (const s of [-0.3, 0.05, 0.4, 0.7]) {
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.255 * Math.sqrt(1 - s * s), 0.02, 8, 28), mat(0x3a2413));
+    ring.position.set(0, -0.03, 0.62 + s * 0.5); ring.scale.set(1, 0.94, 1); g.add(ring);
+  }
+  ell(0.19, 0.18, 0.19, mat(0x8a5a2b), 0, 0, -0.40);
+  for (const s of [-1, 1]) {
+    ell(0.13, 0.15, 0.13, mat(0xd11f2e, { emissive: 0x5a0a10, roughness: 0.3 }), s * 0.13, 0.04, -0.44);
+    const ant = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.14, 8), mat(0x3a2413));
+    ant.rotation.x = -Math.PI / 2; ant.position.set(s * 0.05, 0.10, -0.60); g.add(ant);
+    for (const z of [-0.15, 0.0, 0.15]) {
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.34, 6), mat(0x3a2413));
+      leg.position.set(s * 0.17, -0.26, z); leg.rotation.z = s * 0.45; g.add(leg);
+    }
+  }
+  const proboscis = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.03, 0.14, 8), mat(0x3a2413));
+  proboscis.position.set(0, -0.15, -0.52); proboscis.rotation.x = 0.4; g.add(proboscis);
+  const wings = [];
+  for (const s of [-1, 1]) {
+    const pivot = new THREE.Group(); pivot.position.set(s * 0.12, 0.2, -0.02);
+    const wing = new THREE.Mesh(new THREE.SphereGeometry(1, 24, 12),
+      new THREE.MeshStandardMaterial({ color: 0xbfe9ff, transparent: true, opacity: 0.42, roughness: 0.2, side: THREE.DoubleSide }));
+    wing.scale.set(0.46, 0.012, 0.17); wing.position.set(s * 0.44, 0, 0.14);
+    pivot.add(wing); g.add(pivot); wings.push({ pivot, s });
+  }
+  return { group: g, wings };
+}
+const fly = makeFly();
+scene.add(fly.group);
+
+let wallGroup = null;
+function buildWall(gapC) {
+  if (wallGroup) scene.remove(wallGroup);
+  wallGroup = new THREE.Group();
+  const H = 7, y0 = -2.5, depth = 0.7;
+  const solid = new THREE.MeshStandardMaterial({ color: 0x3c8f86, emissive: 0x2aa398, emissiveIntensity: 0.55, roughness: 0.6 });
+  const edge = new THREE.LineBasicMaterial({ color: 0x99E1D9 });
+  const segs = [[-40, gapC - GAPC_HALF], [gapC + GAPC_HALF, 40]];
+  for (const [a, b] of segs) {
+    if (b - a <= 0.01) continue;
+    const box = new THREE.Mesh(new THREE.BoxGeometry(b - a, H, depth), solid);
+    box.position.set((a + b) / 2, y0 + H / 2, 0); wallGroup.add(box);
+    const lines = new THREE.LineSegments(new THREE.EdgesGeometry(box.geometry), edge);
+    lines.position.copy(box.position); wallGroup.add(lines);
+  }
+  for (const x of [gapC - GAPC_HALF, gapC + GAPC_HALF]) {
+    const post = new THREE.Mesh(new THREE.BoxGeometry(0.14, H, depth + 0.1),
+      new THREE.MeshBasicMaterial({ color: 0x99E1D9 }));
+    post.position.set(x, y0 + H / 2, 0); wallGroup.add(post);
+  }
+  scene.add(wallGroup);
+}
+
+// particles for a crash
+const particles = [];
+function burst(color) {
+  for (let i = 0; i < 46; i++) {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(0.06 + Math.random() * 0.06, 6, 6), new THREE.MeshBasicMaterial({ color, transparent: true }));
+    m.position.copy(fly.group.position);
+    const v = new THREE.Vector3((Math.random() - .5) * 8, Math.random() * 5, (Math.random() - .5) * 8);
+    scene.add(m); particles.push({ m, v, life: 1 });
+  }
+}
+let ring = null;
+function okRing() {
+  ring = new THREE.Mesh(new THREE.RingGeometry(0.5, 0.58, 40), new THREE.MeshBasicMaterial({ color: 0x7be0a0, transparent: true, side: THREE.DoubleSide }));
+  ring.position.copy(fly.group.position); scene.add(ring); ring.userData.life = 1;
+}
+
+// ---------- ui ----------
+const $ = id => document.getElementById(id);
+const modeSel = $('mode');
+for (const k of Object.keys(MODES)) { const o = document.createElement('option'); o.value = k; o.textContent = MODES[k].label; modeSel.appendChild(o); }
+
+function fmtPct(v) { return (v * 100).toFixed(0) + '%'; }
+function buildScores() {
+  const t = $('scores'); t.innerHTML = '';
+  for (const k of Object.keys(MODES)) {
+    const m = DATA.summary.modes[k]; if (!m) continue;
+    const tr = document.createElement('tr'); if (k === state.mode) tr.className = 'sel';
+    tr.innerHTML = `<td>${MODES[k].label.replace('Control: ', '').replace('Baseline: ', '')}</td><td>${fmtPct(m.accuracy)}</td>`;
+    t.appendChild(tr);
+  }
+  const n = DATA.summary.n_trials;
+  $('scoreNote').textContent = `Dodged = the fly fits through the gap. ${n} random walls per row (left or right gap). Chance is 50%. The 12 walls you can replay here are the first 12 of them.`;
+}
+function buildDots() {
+  const box = $('dots'); box.innerHTML = '';
+  DATA.modes[state.mode].forEach((tr, i) => {
+    const s = document.createElement('span'); s.className = tr.dodged ? 'ok' : 'bad'; s.title = `wall ${i + 1}: ${tr.dodged ? 'dodged' : 'hit'}`;
+    s.onclick = () => setTrial(i); box.appendChild(s);
+  });
+}
+function markDots() { [...$('dots').children].forEach((s, i) => s.classList.toggle('cur', i === state.trial)); }
+
+function setMode(m) { state.mode = m; state.trial = 0; modeSel.value = m; $('modeDesc').textContent = MODES[m].desc; buildDots(); buildScores(); setTrial(0); }
+function setTrial(i) {
+  const list = DATA.modes[state.mode]; state.trial = (i + list.length) % list.length; state.t = 0; state.fired = false; state.hold = 0;
+  const tr = list[state.trial]; buildWall(tr.gap); markDots();
+  $('trialInfo').textContent = `wall ${state.trial + 1} of ${list.length} · gap is on the ${tr.gap > 0 ? 'RIGHT' : 'LEFT'}`;
+  $('banner').style.opacity = 0;
+  particles.splice(0).forEach(p => scene.remove(p.m));
+}
+modeSel.onchange = () => setMode(modeSel.value);
+$('play').onclick = () => { state.playing = !state.playing; $('play').textContent = state.playing ? 'Pause' : 'Play'; };
+$('prev').onclick = () => setTrial(state.trial - 1);
+$('next').onclick = () => setTrial(state.trial + 1);
+$('restart').onclick = () => setTrial(state.trial);
+function togglePanels(force) { const hide = force ?? $('left').style.display !== 'none'; $('left').style.display = $('right').style.display = hide ? 'none' : ''; $('hide').textContent = hide ? 'Show panels' : 'Hide panels'; }
+$('hide').onclick = () => togglePanels();
+$('speed').oninput = e => { state.speed = +e.target.value; $('speedv').textContent = state.speed + 'x'; };
+addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); $('play').click(); } if (e.code === 'KeyH') togglePanels(); if (e.code === 'ArrowRight') $('next').click(); if (e.code === 'ArrowLeft') $('prev').click(); });
+
+function bar(id, v, max, unit = '') { $(id).style.width = Math.max(0, Math.min(100, v / max * 100)) + '%'; if ($(id + 'v')) $(id + 'v').textContent = Math.round(v) + unit; }
+
+const mini = $('mini'), mctx = mini.getContext('2d');
+function drawMini(d, x, gapC, dodged, finished) {
+  const W = mini.width, H = mini.height, X = v => W / 2 + v / 16 * (W / 2), Y = v => H - 26 - v / 62 * (H - 40);
+  mctx.clearRect(0, 0, W, H);
+  mctx.fillStyle = '#241D22'; mctx.fillRect(0, 0, W, H);
+  mctx.strokeStyle = '#3a3037'; mctx.beginPath(); mctx.moveTo(W / 2, 0); mctx.lineTo(W / 2, H); mctx.stroke();
+  const y = Y(Math.max(d, -1.5));
+  mctx.fillStyle = '#2c8f86'; mctx.fillRect(X(-16), y - 6, X(gapC - GAPC_HALF) - X(-16), 12); mctx.fillRect(X(gapC + GAPC_HALF), y - 6, X(16) - X(gapC + GAPC_HALF), 12);
+  mctx.fillStyle = 'rgba(123,224,160,.25)'; mctx.fillRect(X(gapC - GAPC_HALF), y - 6, X(gapC + GAPC_HALF) - X(gapC - GAPC_HALF), 12);
+  mctx.fillStyle = finished && !dodged ? '#FF8FA3' : '#FFD166';
+  mctx.beginPath(); mctx.moveTo(X(x), Y(0) - 10); mctx.lineTo(X(x) - 8, Y(0) + 8); mctx.lineTo(X(x) + 8, Y(0) + 8); mctx.closePath(); mctx.fill();
+  mctx.fillStyle = '#B9AEB5'; mctx.font = '11px system-ui'; mctx.fillText('wall', 6, 14); mctx.fillText('fly', 6, H - 8);
+}
+
+function frameAt(frames, t) {
+  const f = t / CTRL, i = Math.min(frames.length - 1, Math.floor(f)), j = Math.min(frames.length - 1, i + 1), a = Math.min(1, f - i);
+  return frames[i].map((v, k) => v + (frames[j][k] - v) * a);
+}
+
+// ---------- loop ----------
+let last = performance.now(), prevX = 0;
+function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+addEventListener('resize', resize); resize();
+
+function tick(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  const tr = DATA.modes[state.mode][state.trial], T = tr.frames.length * CTRL;
+  if (state.playing) state.t += dt * state.speed;
+
+  const tt = Math.min(state.t, T - 1e-6);
+  const fr = frameAt(tr.frames, tt);
+  const [d, x, inL, inR, sL, sR, rel, dL, dR] = fr;
+  const finished = state.t >= T;
+
+  let wallD = d;
+  if (finished) wallD = tr.dodged ? -(state.t - T) * P.WALL_SPEED : 0;
+  wallGroup.position.z = -wallD;
+  const vx = (x - prevX) / Math.max(dt, 1e-3); prevX = x;
+  fly.group.position.set(x, 0, 0);
+  fly.group.rotation.z += ((-Math.max(-14, Math.min(14, vx)) * 0.05) - fly.group.rotation.z) * 0.2;
+  fly.group.position.y = Math.sin(now / 900) * 0.05 + (finished && !tr.dodged ? -Math.min(1.6, (state.t - T) * 2.5) : 0);
+  if (finished && !tr.dodged) fly.group.rotation.x = Math.min(1.4, (state.t - T) * 4);
+  else fly.group.rotation.x = 0;
+  for (const w of fly.wings) w.pivot.rotation.z = w.s * (0.25 + 0.75 * Math.sin(now / 1000 * 2 * Math.PI * 9));
+
+  bar('inL', inL, 150, ' Hz'); bar('inR', inR, 150, ' Hz');
+  bar('sL', sL, 60); bar('sR', sR, 60); bar('rel', rel, 60);
+  bar('dL', dL, 100); bar('dR', dR, 100);
+  drawMini(wallD, x, tr.gap, tr.dodged, finished);
+
+  if (finished && !state.fired) {
+    state.fired = true;
+    const b = $('banner'); b.textContent = tr.dodged ? 'DODGED' : 'HIT'; b.style.color = tr.dodged ? '#7be0a0' : '#FF8FA3'; b.style.opacity = 1;
+    if (tr.dodged) okRing(); else { burst(0xFF8FA3); const f = $('flash'); f.style.transition = 'none'; f.style.opacity = .35; requestAnimationFrame(() => { f.style.transition = 'opacity .6s'; f.style.opacity = 0; }); }
+  }
+  if (finished && state.playing) {
+    state.hold += dt * state.speed;
+    if (state.hold > 1.6 && $('auto').checked) setTrial(state.trial + 1);
+  }
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i]; p.life -= dt * 0.9; p.v.y -= 9 * dt; p.m.position.addScaledVector(p.v, dt); p.m.material.opacity = Math.max(0, p.life);
+    if (p.life <= 0) { scene.remove(p.m); particles.splice(i, 1); }
+  }
+  if (ring) { ring.userData.life -= dt * 1.2; ring.scale.setScalar(1 + (1 - ring.userData.life) * 4); ring.material.opacity = Math.max(0, ring.userData.life); ring.lookAt(camera.position); if (ring.userData.life <= 0) { scene.remove(ring); ring = null; } }
+
+  const follow = (x * 0.75 - controls.target.x) * Math.min(1, dt * 6);
+  camera.position.x += follow; controls.target.x += follow;
+  controls.update();
+  renderer.render(scene, camera);
+  requestAnimationFrame(tick);
+}
+const hp = new URLSearchParams(location.hash.slice(1));
+setMode(MODES[hp.get('mode')] ? hp.get('mode') : 'brain');
+if (hp.has('trial')) setTrial(+hp.get('trial'));
+if (hp.has('t')) state.t = +hp.get('t');
+if (hp.has('hide')) togglePanels(true);
+if (hp.has('pause')) { state.playing = false; $('play').textContent = 'Play'; }
+if (hp.has('speed')) { state.speed = +hp.get('speed'); $('speed').value = state.speed; $('speedv').textContent = state.speed + 'x'; }
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

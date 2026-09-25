@@ -1,0 +1,72 @@
+{
+  "n_trials": 100,
+  "gain": 2.0,
+  "modes": {
+    "brain": {
+      "dodged": 100,
+      "accuracy": 1.0,
+      "ci95": [
+        0.963,
+        1.0
+      ],
+      "accuracy_gap_left": 1.0,
+      "accuracy_gap_right": 1.0,
+      "seconds": 26.8
+    },
+    "swapped": {
+      "dodged": 0,
+      "accuracy": 0.0,
+      "ci95": [
+        0.0,
+        0.037
+      ],
+      "accuracy_gap_left": 0.0,
+      "accuracy_gap_right": 0.0,
+      "seconds": 26.6
+    },
+    "scrambled_eyes": {
+      "dodged": 1,
+      "accuracy": 0.01,
+      "ci95": [
+        0.002,
+        0.054
+      ],
+      "accuracy_gap_left": 0.016,
+      "accuracy_gap_right": 0.0,
+      "seconds": 26.3
+    },
+    "random": {
+      "dodged": 50,
+      "accuracy": 0.5,
+      "ci95": [
+        0.404,
+        0.596
+      ],
+      "accuracy_gap_left": 0.426,
+      "accuracy_gap_right": 0.615,
+      "seconds": 0.1
+    }
+  },
+  "gain_sweep_brain_accuracy": {
+    "n_trials": 40,
+    "by_gain": {
+      "1.0": 0.7,
+      "1.5": 0.975,
+      "2.0": 1.0,
+      "3.0": 1.0,
+      "4.0": 0.375
+    }
+  },
+  "params": {
+    "D_START": 60.0,
+    "WALL_SPEED": 20.0,
+    "GAP_W": 8.0,
+    "FLY_HALF": 0.8,
+    "WINDOW": 6.0,
+    "MAX_RATE": 150.0,
+    "LOOM_D0": 15.0,
+    "STEER": 0.2,
+    "V_MAX": 12.0,
+    "CONTROL_MS": 20
+  }
+}

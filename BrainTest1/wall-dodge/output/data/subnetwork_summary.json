@@ -1,0 +1,32 @@
+{
+  "neurons": 820,
+  "sensory_LPLC": {
+    "total": 416,
+    "left": 210,
+    "right": 206,
+    "unknown_side": 0
+  },
+  "relays": 400,
+  "motor_DNa": {
+    "total": 4,
+    "left": 2,
+    "right": 2
+  },
+  "connections_kept": 53995,
+  "synapses_kept": 336112,
+  "inhibitory_neurons": 102,
+  "relay_types_top10": {
+    "LLPC1": 48,
+    "LT51": 19,
+    "LC19": 12,
+    "CB4103": 9,
+    "LoVP93": 8,
+    "CB4101": 7,
+    "PLP009": 6,
+    "PVLP214m": 6,
+    "CB1852": 5,
+    "PS208": 5
+  },
+  "connections_into_motor": 539,
+  "connections_from_sensory_to_relay": 9956
+}

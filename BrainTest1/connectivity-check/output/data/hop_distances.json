@@ -1,0 +1,85 @@
+{
+  "johnstons_organ": {
+    "DNa01": {
+      "reachable": true,
+      "min_hop": 2,
+      "example_target_bodyId": 10442,
+      "example_path": [
+        859985596,
+        15192,
+        10442
+      ]
+    },
+    "DNa02": {
+      "reachable": true,
+      "min_hop": 2,
+      "example_target_bodyId": 10360,
+      "example_path": [
+        762295104,
+        11610,
+        10360
+      ]
+    },
+    "MDN": {
+      "reachable": true,
+      "min_hop": 2,
+      "example_target_bodyId": 10763,
+      "example_path": [
+        183993,
+        12447,
+        10763
+      ]
+    },
+    "DNp09": {
+      "reachable": true,
+      "min_hop": 2,
+      "example_target_bodyId": 10783,
+      "example_path": [
+        469098413,
+        520401,
+        10783
+      ]
+    }
+  },
+  "looming_lplc": {
+    "DNa01": {
+      "reachable": true,
+      "min_hop": 2,
+      "example_target_bodyId": 10442,
+      "example_path": [
+        23394,
+        11726,
+        10442
+      ]
+    },
+    "DNa02": {
+      "reachable": true,
+      "min_hop": 2,
+      "example_target_bodyId": 10360,
+      "example_path": [
+        18314,
+        529641,
+        10360
+      ]
+    },
+    "MDN": {
+      "reachable": true,
+      "min_hop": 2,
+      "example_target_bodyId": 10763,
+      "example_path": [
+        18365,
+        10070,
+        10763
+      ]
+    },
+    "DNp09": {
+      "reachable": true,
+      "min_hop": 1,
+      "example_target_bodyId": 10783,
+      "example_path": [
+        525844,
+        10783
+      ]
+    }
+  }
+}

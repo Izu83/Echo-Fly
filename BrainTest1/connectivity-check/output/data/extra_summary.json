@@ -1,0 +1,90 @@
+{
+  "path_strength": {
+    "johnstons_organ->DNa01": {
+      "direct": 0,
+      "twohop": 4658,
+      "paths": 1299
+    },
+    "johnstons_organ->DNa02": {
+      "direct": 0,
+      "twohop": 6556,
+      "paths": 2322
+    },
+    "johnstons_organ->MDN": {
+      "direct": 0,
+      "twohop": 4723,
+      "paths": 2475
+    },
+    "johnstons_organ->DNp09": {
+      "direct": 0,
+      "twohop": 2425,
+      "paths": 1357
+    },
+    "looming_lplc->DNa01": {
+      "direct": 0,
+      "twohop": 15050,
+      "paths": 4773
+    },
+    "looming_lplc->DNa02": {
+      "direct": 0,
+      "twohop": 29787,
+      "paths": 8791
+    },
+    "looming_lplc->MDN": {
+      "direct": 0,
+      "twohop": 17172,
+      "paths": 6901
+    },
+    "looming_lplc->DNp09": {
+      "direct": 111,
+      "twohop": 31075,
+      "paths": 13955
+    }
+  },
+  "left_right_2hop_turning": {
+    "johnstons_organ:L->L": 4854,
+    "johnstons_organ:L->R": 2196,
+    "johnstons_organ:R->L": 991,
+    "johnstons_organ:R->R": 3173,
+    "looming_lplc:L->L": 15425,
+    "looming_lplc:L->R": 6950,
+    "looming_lplc:R->L": 6925,
+    "looming_lplc:R->R": 15537
+  },
+  "relay_neurotransmitter_share": {
+    "johnstons_organ": {
+      "acetylcholine": 0.6332,
+      "gaba": 0.289,
+      "glutamate": 0.0133,
+      "other": 0.0645
+    },
+    "looming_lplc": {
+      "acetylcholine": 0.6063,
+      "gaba": 0.2612,
+      "glutamate": 0.1132,
+      "other": 0.0193
+    }
+  },
+  "top_relay_types": {
+    "johnstons_organ": {
+      "pIP1": 3140,
+      "GNG583": 877,
+      "DNge132": 848,
+      "DNge138": 767,
+      "GNG494": 697,
+      "DNg09_a": 572,
+      "GNG515": 563,
+      "CB0540": 546
+    },
+    "looming_lplc": {
+      "PS065": 4675,
+      "PS306": 4614,
+      "LPLC2": 4247,
+      "AVLP531": 4180,
+      "PLP029": 3488,
+      "LT51": 3260,
+      "pIP1": 3080,
+      "LC31b": 2570
+    }
+  }
+}

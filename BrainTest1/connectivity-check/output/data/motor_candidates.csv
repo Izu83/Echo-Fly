@@ -1,0 +1,11 @@
+bodyId,type,instance,class,superclass,somaSide,motor_role
+10360,DNa02,DNa02_R,,descending_neuron,R,turn
+10442,DNa01,DNa01(VES006)_L,,descending_neuron,L,turn
+10760,DNa01,DNa01(VES006)_R,,descending_neuron,R,turn
+10763,MDN,MDN_R,,descending_neuron,R,back up (moonwalker)
+10783,DNp09,DNp09_L,,descending_neuron,L,"walk forward (aka ""P9"", Bidaye et al. 2020)"
+11177,DNp09,DNp09_R,,descending_neuron,R,"walk forward (aka ""P9"", Bidaye et al. 2020)"
+11288,MDN,MDN_L,,descending_neuron,L,back up (moonwalker)
+11332,MDN,MDN_R,,descending_neuron,R,back up (moonwalker)
+12348,MDN,MDN_L,,descending_neuron,L,back up (moonwalker)
+523769,DNa02,DNa02_L,,descending_neuron,L,turn
