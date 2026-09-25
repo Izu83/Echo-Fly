@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/readme/banner.svg" alt="Echo-Fly: made by Nikolay Rangelov, Kiril Borisov and Ivan Damiankin, UKTC" width="100%">
+  <img src="assets/readme/banner.svg" alt="Echo-Fly: made by Nikolay Rangelov, Kiril Borisov, Ivan Damiankin and Mitko Totev, UKTC" width="100%">
 </p>
 
 > [!WARNING]
@@ -15,6 +15,8 @@
   <a href="https://github.com/KikarrA"><img src="assets/readme/team-kikarra.svg" alt="Kiril Borisov (@KikarrA)" height="150"></a>
   &nbsp;&nbsp;
   <a href="https://github.com/IvanDD916"><img src="assets/readme/team-ivandd916.svg" alt="Ivan Damiankin (@IvanDD916)" height="150"></a>
+  &nbsp;&nbsp;
+  <a href="https://github.com/miti0o0"><img src="assets/readme/team-miti0o0.svg" alt="Mitko Totev (@miti0o0)" height="150"></a>
 </p>
 
 <p align="center">
@@ -47,7 +49,7 @@
 <a name="about"></a>
 <img src="assets/readme/h-about.svg" alt="About" height="56">
 
-**Echo-Fly** is an 11th grade project by three students from **UKTC** (Pravets, Bulgaria).
+**Echo-Fly** is an 11th grade project by four students from **UKTC** (Pravets, Bulgaria).
 
 The short version: we want to build a **simulated echolocator** (a sonar, like a bat uses) and try to plug it into a **simulation of a real fruit fly brain**. Then we'll see if that brain can do anything useful with it, like dodging walls or finding a way out of a building.
 
@@ -149,6 +151,7 @@ To be upfront about what this is and isn't:
 | **Nikolay Rangelov** | [@Izu83](https://github.com/Izu83) |
 | **Kiril Borisov** | [@KikarrA](https://github.com/KikarrA) |
 | **Ivan Damiankin** | [@IvanDD916](https://github.com/IvanDD916) |
+| **Mitko Totev** | [@miti0o0](https://github.com/miti0o0) |
 
 From **UKTC**, the Vocational High School of Computer Technologies and Systems in Pravets, Bulgaria: [uktc-bg.com](https://uktc-bg.com)
 

@@ -38,6 +38,7 @@ TEAM = [
     ("Nikolay Rangelov", "Izu83"),
     ("Kiril Borisov", "KikarrA"),
     ("Ivan Damiankin", "IvanDD916"),
+    ("Mitko Totev", "miti0o0"),
 ]
 
 # (label, anchor) for the contents buttons
@@ -213,7 +214,8 @@ def fly_glyph(cx, cy, s, color):
 # ---------------------------------------------------------------- assets
 
 def banner(fonts):
-    s = Svg(1200, 320, "Echo-Fly: made by Nikolay Rangelov, Kiril Borisov and Ivan Damiankin, UKTC")
+    names = [name for name, _ in TEAM]
+    s = Svg(1200, 320, "Echo-Fly: made by " + ", ".join(names[:-1]) + " and " + names[-1] + ", UKTC")
     s.add(
         '<defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="0">'
         f'<stop offset="0" stop-color="{MULBERRY}"/><stop offset=".62" stop-color="{MULBERRY}"/>'
@@ -223,7 +225,10 @@ def banner(fonts):
     s.text(70, 118, "Echo-Fly", 76, 700, TURQUOISE)
     s.text(72, 162, "A simulated blind fruit fly brain, a homemade echolocator, and a lot of question marks", 21, 400, WHITE)
     s.add(f'<rect x="72" y="186" width="70" height="4" rx="2" fill="{TURQUOISE}"/>')
-    s.text(72, 232, "Made by Nikolay Rangelov · Kiril Borisov · Ivan Damiankin", 27, 600, WHITE)
+    made_by = "Made by " + " · ".join(names)
+    # shrink the line if the names would run into the sonar logo on the right
+    size = min(27, 27 * 790 / fonts[600].width(made_by, 27))
+    s.text(72, 232, made_by, round(size, 1), 600, WHITE)
     s.text(72, 266, "11th grade project  ·  UKTC  ·  Pravets, Bulgaria", 18, 400, MUTED)
 
     # status chip
