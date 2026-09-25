@@ -272,8 +272,8 @@ let last = performance.now(), prevX = 0;
 function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
 addEventListener('resize', resize); resize();
 
-function tick(now) {
-  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+let cur = {};
+function update(dt, now) {
   const tr = DATA.modes[state.mode][state.trial], T = tr.frames.length * CTRL;
   if (state.playing) state.t += dt * state.speed;
 
@@ -297,6 +297,7 @@ function tick(now) {
   bar('sL', sL, 60); bar('sR', sR, 60); bar('rel', rel, 60);
   bar('dL', dL, 100); bar('dR', dR, 100);
   drawMini(wallD, x, tr.gap, tr.dodged, finished);
+  cur = { tr, inL, inR, dL, dR, x, wallD, finished };
 
   if (finished && !state.fired) {
     state.fired = true;
@@ -317,7 +318,56 @@ function tick(now) {
   camera.position.x += follow; controls.target.x += follow;
   controls.update();
   renderer.render(scene, camera);
+}
+function tick(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  update(dt, now);
   requestAnimationFrame(tick);
+}
+
+// ---------- GIF capture (used by scripts/capture_gifs.py): #capture=name:mode:trial ----------
+function drawOverlay(c, w, h, mode, trial) {
+  const k = cur, s = w / 640;
+  c.textAlign = 'start'; c.font = `${13 * s}px system-ui, sans-serif`;
+  c.fillStyle = 'rgba(36,29,34,.8)'; c.fillRect(10 * s, 10 * s, 290 * s, 44 * s);
+  c.fillStyle = '#99E1D9'; c.fillText(MODES[mode].label, 18 * s, 28 * s);
+  c.fillStyle = '#B9AEB5'; c.fillText(`wall ${trial + 1} \u00b7 open side is the ${k.tr.gap > 0 ? 'RIGHT' : 'LEFT'}`, 18 * s, 46 * s);
+  const bars = [['left eye', k.inL, 150, '#FF8FA3'], ['right eye', k.inR, 150, '#FF8FA3'], ['DNa left', k.dL, 100, '#E9C46A'], ['DNa right', k.dR, 100, '#E9C46A']];
+  c.fillStyle = 'rgba(36,29,34,.8)'; c.fillRect(10 * s, h - 98 * s, 230 * s, 88 * s);
+  bars.forEach(([lab, v, max, col], i) => {
+    const y = h - 84 * s + i * 20 * s;
+    c.fillStyle = '#B9AEB5'; c.fillText(lab, 18 * s, y + 9 * s);
+    c.fillStyle = '#3a3037'; c.fillRect(85 * s, y, 140 * s, 9 * s);
+    c.fillStyle = col; c.fillRect(85 * s, y, 140 * s * Math.max(0, Math.min(1, v / max)), 9 * s);
+  });
+  drawMini(k.wallD, k.x, k.tr.gap, k.tr.dodged, k.finished);
+  c.drawImage($('mini'), w - 170 * s, 10 * s, 160 * s, 104 * s);
+  if (k.finished) {
+    c.font = `800 ${54 * s}px system-ui, sans-serif`; c.textAlign = 'center';
+    c.shadowColor = '#000'; c.shadowBlur = 18 * s;
+    c.fillStyle = k.tr.dodged ? '#7be0a0' : '#FF8FA3';
+    c.fillText(k.tr.dodged ? 'DODGED' : 'HIT', w / 2, h * 0.38);
+    c.shadowBlur = 0; c.textAlign = 'start';
+  }
+}
+async function capture(name, mode, trial, t0, t1, fps, w, h) {
+  $('auto').checked = false;
+  setMode(mode); setTrial(trial);
+  state.playing = true; state.speed = 1;
+  renderer.setPixelRatio(1); renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+  const comp = document.createElement('canvas'); comp.width = w; comp.height = h;
+  const c = comp.getContext('2d');
+  const dt = 1 / fps; let now = 0;
+  while (state.t < t0 - 1e-9) { update(dt, now); now += dt * 1000; }
+  const n = Math.round((t1 - t0) * fps);
+  for (let i = 0; i < n; i++) {
+    update(dt, now); now += dt * 1000;
+    c.drawImage(renderer.domElement, 0, 0, w, h);
+    drawOverlay(c, w, h, mode, trial);
+    await fetch(`/frame?name=${name}&i=${i}`, { method: 'POST', body: comp.toDataURL('image/png') });
+  }
+  await fetch(`/done?name=${name}&fps=${fps}`, { method: 'POST' });
+  document.title = 'capture done: ' + name;
 }
 const hp = new URLSearchParams(location.hash.slice(1));
 setMode(MODES[hp.get('mode')] ? hp.get('mode') : 'brain');
@@ -326,7 +376,10 @@ if (hp.has('t')) state.t = +hp.get('t');
 if (hp.has('hide')) togglePanels(true);
 if (hp.has('pause')) { state.playing = false; $('play').textContent = 'Play'; }
 if (hp.has('speed')) { state.speed = +hp.get('speed'); $('speed').value = state.speed; $('speedv').textContent = state.speed + 'x'; }
-requestAnimationFrame(tick);
+if (hp.has('capture')) {
+  const [name, mode, trial] = hp.get('capture').split(':');
+  capture(name, mode, +trial, 0.8, 4.4, 20, 640, 360);
+} else requestAnimationFrame(tick);
 </script>
 </body>
 </html>

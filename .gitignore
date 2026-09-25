@@ -5,3 +5,6 @@ __pycache__/
 BrainTest1/data/
 BrainTest1/**/synapse_points_cache.feather
 *.pyc
+
+# lives on the raycast-v1 branch, not on main
+RayCastV1/

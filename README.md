@@ -3,7 +3,7 @@
 </p>
 
 > [!WARNING]
-> **Echo-Fly is still early, and everything here comes with caveats.** So far we have a check of the fly connectome's wiring, a first spiking wall-dodge simulation driven by a simple *looming* input, and a browser sonar prototype. We do **not** have the sonar wired into the fly brain yet. The results come from a small simulated circuit and rest on stated assumptions, so read them as *"promising"*, not *"proven"*.
+> **Echo-Fly is still early, and everything here comes with caveats.** So far we have a check of the fly connectome's wiring, a first spiking wall-dodge simulation driven by a simple *looming* input, and a browser sonar prototype (on the [`raycast-v1` branch](https://github.com/Izu83/Echo-Fly/tree/raycast-v1/RayCastV1)). We do **not** have the sonar wired into the fly brain yet. The results come from a small simulated circuit and rest on stated assumptions, so read them as *"promising"*, not *"proven"*.
 
 <p align="center">
   <a href="https://uktc-bg.com"><img src="assets/readme/school-uktc.svg" alt="UKTC, uktc-bg.com" height="120"></a>
@@ -125,6 +125,17 @@ The fly brain might always pick the same side, or might do something we don't ex
 | No brain, random side | 50 |
 
 <p align="center">
+  <img src="BrainTest1/wall-dodge/output/gifs/dodge_gap_left.gif" alt="The fly dodges a wall whose open side is on the left" width="49%">
+  <img src="BrainTest1/wall-dodge/output/gifs/dodge_gap_right.gif" alt="The fly dodges a wall whose open side is on the right" width="49%">
+</p>
+<p align="center"><sub><b>Real fly wiring.</b> Left: the open side is on the left. Right: the open side is on the right. The bars show what each eye sees and how active the left and right steering neurons (DNa) are.</sub></p>
+
+<p align="center">
+  <img src="BrainTest1/wall-dodge/output/gifs/control_swapped_hit.gif" alt="Control: with the eyes swapped the fly steers the wrong way and hits the wall" width="49%">
+</p>
+<p align="center"><sub><b>Control.</b> The same brain with the left and right eye swapped: it steers the wrong way and hits the wall. These are recorded simulation runs replayed in 3D, not a live fly.</sub></p>
+
+<p align="center">
   <img src="BrainTest1/wall-dodge/output/graphs/accuracy_by_condition.png" alt="Wall dodge accuracy by condition" width="60%">
 </p>
 
@@ -133,7 +144,7 @@ There is an interactive 3D version with a flapping fly and a flying wall: downlo
 > [!IMPORTANT]
 > **How much to trust this.** The dodge direction depends on an assumption we did not test: that a DNa neuron turns the fly toward its own side. With the opposite assumption the real-wiring and swapped-wire results would trade places. The task is also easy (a whole half of the wall is open), and one global synaptic gain was set so the small circuit works (it works from about 1.5 to 3, and breaks at 4). Details and the full list of caveats are in [`wall-dodge/README.md`](BrainTest1/wall-dodge/README.md).
 
-**3. Echo Room** ([`RayCastV1`](RayCastV1/)). A first-person laser-sonar prototype that runs in a browser (open `RayCastV1/index.html`, on a computer or a phone). It is the sonar side of the project; it is not connected to the fly brain yet.
+The sonar side lives on its own branch: the first-person laser-sonar prototype *Echo Room* is on [`raycast-v1`](https://github.com/Izu83/Echo-Fly/tree/raycast-v1/RayCastV1). It is not connected to the fly brain yet.
 
 ### Run it yourself
 
@@ -168,7 +179,7 @@ Only if the first demo goes somewhere. The fly is placed **blind inside a buildi
 - [x] Build the wall simulation *(with a looming input)*
 - [x] Connect it to the fly circuit for a single wall / single trial
 - [x] Run many trials + the swapped-wire control *(with a looming input)*
-- [x] Browser sonar prototype (Echo Room)
+- [x] Browser sonar prototype (Echo Room, on the [`raycast-v1` branch](https://github.com/Izu83/Echo-Fly/tree/raycast-v1/RayCastV1))
 - [ ] Replace the looming input with sonar echoes and wire it into the fly brain
 - [ ] Test the steering-direction assumption and stronger controls
 - [ ] *(Maybe)* Building escape

@@ -8,6 +8,13 @@ right. The steering is decided by a spiking simulation of a real piece of the ma
 (needs internet once, to load the three.js library). Pick a condition, replay 12 walls each, orbit with
 the mouse. Deep links work too, for example `wall_dodge_3d.html#mode=swapped&trial=2&t=2.5&pause`.
 
+<p align="center">
+  <img src="output/gifs/dodge_gap_left.gif" alt="dodge, open side left" width="32%">
+  <img src="output/gifs/dodge_gap_right.gif" alt="dodge, open side right" width="32%">
+  <img src="output/gifs/control_swapped_hit.gif" alt="control with swapped eyes, hit" width="32%">
+</p>
+<p align="center"><sub>Real wiring dodging to the left and to the right, and the swapped-eye control hitting the wall.</sub></p>
+
 ## What happens, step by step
 
 1. **A wall approaches** from 60 units away at 20 units/s (3 seconds). One side of it is open.
@@ -77,6 +84,7 @@ python scripts/build_subnetwork.py   # ~1 min, reads ../data
 python scripts/simulate.py 100       # ~3 min, 100 walls x 4 conditions + gain sweep
 python scripts/plot_results.py
 python scripts/build_web.py          # bakes the recording into output/web/wall_dodge_3d.html
+python scripts/capture_gifs.py --open  # optional: records the GIFs in output/gifs (needs Pillow; uses your browser)
 ```
 
 ## Ideas for next steps
