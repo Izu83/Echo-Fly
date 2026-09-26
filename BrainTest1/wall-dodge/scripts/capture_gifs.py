@@ -44,7 +44,11 @@ def url_for(i):
 
 def build_gif(name, fps):
     imgs = [Image.open(io.BytesIO(frames[name][i])).convert("RGB") for i in sorted(frames[name])]
-    palette = imgs[len(imgs) // 2].quantize(colors=128, method=Image.Quantize.MEDIANCUT)
+    sample = imgs[::6] + [imgs[-1]]
+    montage = Image.new("RGB", (imgs[0].width, imgs[0].height * len(sample)))
+    for i, im in enumerate(sample):
+        montage.paste(im, (0, i * im.height))
+    palette = montage.quantize(colors=255, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
     quant = [im.quantize(palette=palette, dither=Image.Dither.NONE) for im in imgs]
     GIFS.mkdir(parents=True, exist_ok=True)
     out = GIFS / f"{name}.gif"

@@ -5,15 +5,28 @@ walls **fly at it**, each wall has its **left or right half open**, and the fly 
 right. The steering is decided by a spiking simulation of a real piece of the male fly connectome.
 
 **Watch it:** open [`output/web/wall_dodge_3d.html`](output/web/wall_dodge_3d.html) in a browser
-(needs internet once, to load the three.js library). Pick a condition, replay 12 walls each, orbit with
-the mouse. Deep links work too, for example `wall_dodge_3d.html#mode=swapped&trial=2&t=2.5&pause`.
+(one self-contained file, works offline; the [three.js](https://threejs.org) library, MIT licensed, is built into it
+from [`scripts/vendor/`](scripts/vendor/)). Pick a condition, replay 12 walls each, orbit the 3D scene
+with the mouse; the **?** button explains everything on screen. Deep links work too, for example
+`wall_dodge_3d.html#mode=swapped&trial=2&t=2.5&pause`.
+
+**What is on the screen:**
+- **Left:** the condition, the wall (12 dots = 12 replayable walls, plus a top-down map), and what the two eyes see
+  with a steering meter.
+- **Right, "Brain activity":** the 820 simulated neurons drawn where they really sit in the brain (cell-body
+  positions from the connectome; the two optic lobes are the red clusters, the steering neurons the yellow dots).
+  A neuron flashes white when it fires, and the strongest connections light up when their sender fires
+  (teal = excitatory, pink = inhibitory). Drag to rotate. Below it, a trace of the activity over the current wall.
+- **Right, "Results":** how many of the 100 walls each condition dodged.
 
 <p align="center">
-  <img src="output/gifs/dodge_gap_left.gif" alt="dodge, open side left" width="32%">
-  <img src="output/gifs/dodge_gap_right.gif" alt="dodge, open side right" width="32%">
-  <img src="output/gifs/control_swapped_hit.gif" alt="control with swapped eyes, hit" width="32%">
+  <img src="output/gifs/dodge_gap_left.gif" alt="Real wiring: the fly dodges a wall whose open side is on the left" width="49%">
+  <img src="output/gifs/dodge_gap_right.gif" alt="Real wiring: the fly dodges a wall whose open side is on the right" width="49%">
 </p>
-<p align="center"><sub>Real wiring dodging to the left and to the right, and the swapped-eye control hitting the wall.</sub></p>
+<p align="center">
+  <img src="output/gifs/control_swapped_hit.gif" alt="Control with the eyes swapped: the fly steers the wrong way and hits the wall" width="49%">
+</p>
+<p align="center"><sub>Real wiring dodging to the left and to the right (top), and the swapped-eye control hitting the wall (bottom). In each clip the scene is on the left; on the right are the 820 neurons lighting up as they fire, the eye inputs and the steering neurons.</sub></p>
 
 ## What happens, step by step
 
@@ -29,7 +42,9 @@ the mouse. Deep links work too, for example `wall_dodge_3d.html#mode=swapped&tri
 Code: [`scripts/build_subnetwork.py`](scripts/build_subnetwork.py) (cut the circuit out of the connectome),
 [`scripts/brain.py`](scripts/brain.py) (the neuron model), [`scripts/simulate.py`](scripts/simulate.py)
 (the closed loop + all conditions), [`scripts/plot_results.py`](scripts/plot_results.py) and
-[`scripts/build_web.py`](scripts/build_web.py) (charts and the 3D page).
+[`scripts/build_layout.py`](scripts/build_layout.py) (where each neuron sits, for the brain view),
+[`scripts/build_web.py`](scripts/build_web.py) (the 3D page) and [`scripts/capture_gifs.py`](scripts/capture_gifs.py) (the GIFs).
+`simulate.py` also records every spike of the 12 replayable walls, which is what the brain view plays back.
 
 ## Result
 
@@ -79,9 +94,12 @@ the fly moves **left**, toward the open side (and mirror-image for the other sid
 
 ## Reproduce
 
+On Windows, double-click [`../run_game.bat`](../run_game.bat): it runs all the steps below in order and opens the 3D page. Or run them yourself:
+
 ```bash
 python scripts/build_subnetwork.py   # ~1 min, reads ../data
 python scripts/simulate.py 100       # ~3 min, 100 walls x 4 conditions + gain sweep
+python scripts/build_layout.py       # neuron positions for the brain view
 python scripts/plot_results.py
 python scripts/build_web.py          # bakes the recording into output/web/wall_dodge_3d.html
 python scripts/capture_gifs.py --open  # optional: records the GIFs in output/gifs (needs Pillow; uses your browser)

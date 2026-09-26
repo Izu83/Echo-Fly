@@ -113,52 +113,48 @@ The fly brain might always pick the same side, or might do something we don't ex
 
 ### What we've built so far
 
-**1. A wiring check** ([`BrainTest1/connectivity-check`](BrainTest1/connectivity-check/)). Before simulating anything, we asked whether the candidate input neurons are wired to the candidate movement neurons at all, using the [male CNS connectome](https://male-cns.janelia.org/) (211,577 neurons, brain plus nerve cord). They are: the looming neurons (LPLC) and the hearing neurons (Johnston's organ) reach the turning, walking and backing-up neurons in **2 synapses or fewer**, and looming reaches the walking neuron **DNp09** directly. There are charts and a plain-language write-up in that folder.
-
-**2. A wall-dodge simulation** ([`BrainTest1/wall-dodge`](BrainTest1/wall-dodge/)). We cut an 820-neuron circuit out of the connectome (looming inputs, 400 relay neurons, the DNa turning neurons), simulated it as leaky integrate-and-fire neurons, and closed the loop with walls flying at a fly. The fly steers by the difference between its left and right turning neurons. Result over 100 random walls per condition:
-
-| Condition | Walls dodged (of 100) |
-|---|---|
-| Real fly wiring | **100** |
-| Left and right eye swapped (control) | 0 |
-| Eyes randomly scrambled (control) | 1 |
-| No brain, random side | 50 |
+We cut a small circuit out of a real fly brain and put it in charge of steering a simulated fly. Walls fly at the fly, each with its left or right side open, and the fly has to move toward the open side. These are recorded runs replayed in 3D. On the left you see the wall and the fly; on the right, the 820 neurons of the circuit, drawn where they sit in the brain and flashing when they fire.
 
 <p align="center">
   <img src="BrainTest1/wall-dodge/output/gifs/dodge_gap_left.gif" alt="The fly dodges a wall whose open side is on the left" width="49%">
   <img src="BrainTest1/wall-dodge/output/gifs/dodge_gap_right.gif" alt="The fly dodges a wall whose open side is on the right" width="49%">
 </p>
-<p align="center"><sub><b>Real fly wiring.</b> Left: the open side is on the left. Right: the open side is on the right. The bars show what each eye sees and how active the left and right steering neurons (DNa) are.</sub></p>
+<p align="center"><sub><b>Real fly wiring</b>, open side on the left (first clip) and on the right (second clip). When the right eye sees more wall, the left steering neurons fire more and the fly moves left, and the other way round.</sub></p>
 
 <p align="center">
   <img src="BrainTest1/wall-dodge/output/gifs/control_swapped_hit.gif" alt="Control: with the eyes swapped the fly steers the wrong way and hits the wall" width="49%">
+  <img src="BrainTest1/wall-dodge/output/graphs/accuracy_by_condition.png" alt="Walls dodged out of 100, by condition" width="49%">
 </p>
-<p align="center"><sub><b>Control.</b> The same brain with the left and right eye swapped: it steers the wrong way and hits the wall. These are recorded simulation runs replayed in 3D, not a live fly.</sub></p>
-
-<p align="center">
-  <img src="BrainTest1/wall-dodge/output/graphs/accuracy_by_condition.png" alt="Wall dodge accuracy by condition" width="60%">
-</p>
-
-There is an interactive 3D version with a flapping fly and a flying wall: download [`wall_dodge_3d.html`](BrainTest1/wall-dodge/output/web/wall_dodge_3d.html) and open it in a browser (it needs internet once to load the three.js library).
+<p align="center"><sub><b>Control (left):</b> the same brain with the left and right eye swapped steers the wrong way and hits the wall. <b>Results (right):</b> walls dodged out of 100 random walls per condition. Real wiring 100, eyes swapped 0, eyes scrambled 1, a fly with no brain picking a side 50 (chance).</sub></p>
 
 > [!IMPORTANT]
 > **How much to trust this.** The dodge direction depends on an assumption we did not test: that a DNa neuron turns the fly toward its own side. With the opposite assumption the real-wiring and swapped-wire results would trade places. The task is also easy (a whole half of the wall is open), and one global synaptic gain was set so the small circuit works (it works from about 1.5 to 3, and breaks at 4). Details and the full list of caveats are in [`wall-dodge/README.md`](BrainTest1/wall-dodge/README.md).
+
+**How it works**
+
+1. Each eye's *looming* neurons (LPLC, the ones that react to something growing in view) are driven harder the more wall that eye sees and the closer the wall is.
+2. That signal runs through 400 relay neurons to the four steering neurons (DNa01 and DNa02), using the real connections between them (about 54,000) and simple leaky integrate-and-fire neurons.
+3. If the right steering neurons fire more than the left ones, the fly moves right, and the other way round. Nothing else is scripted.
+
+The interactive version, [`wall_dodge_3d.html`](BrainTest1/wall-dodge/output/web/wall_dodge_3d.html), is a single file that works offline: download it and open it in a browser. It has a flapping 3D fly, the live brain view, four conditions to compare and 12 walls per condition to replay. Press **?** in it for an explanation.
+
+**The wiring check that came first** ([`BrainTest1/connectivity-check`](BrainTest1/connectivity-check/)). Before simulating anything, we checked that the candidate input neurons are wired to the candidate movement neurons at all, using the [male CNS connectome](https://male-cns.janelia.org/) (211,577 neurons, brain plus nerve cord). They are: the looming neurons and the hearing neurons (Johnston's organ) reach the turning, walking and backing-up neurons in **2 synapses or fewer**, and looming reaches the walking neuron **DNp09** directly. That folder has the charts and a plain-language write-up.
 
 The sonar side lives on its own branch: the first-person laser-sonar prototype *Echo Room* is on [`raycast-v1`](https://github.com/Izu83/Echo-Fly/tree/raycast-v1/RayCastV1). It is not connected to the fly brain yet.
 
 ### Run it yourself
 
-The connectome tables are about 23 GB, so they are not in this repository. The download script fetches them from Janelia (with `--core` it skips the three largest files, which the simulation does not need):
+On Windows, double-click **`BrainTest1/run_game.bat`**. It runs every step one after another and opens the 3D page at the end:
 
-```bash
-pip install -r BrainTest1/requirements.txt
-python BrainTest1/download_data.py --core
-python BrainTest1/wall-dodge/scripts/build_subnetwork.py
-python BrainTest1/wall-dodge/scripts/simulate.py 100
-python BrainTest1/wall-dodge/scripts/build_web.py
-```
+1. installs the Python packages (`requirements.txt`),
+2. downloads the connectome tables it needs, about 1.9 GB from Janelia (the full data is 23 GB, so it is not in this repository),
+3. cuts the sub-circuit out of the connectome,
+4. runs the simulation (about 3 minutes),
+5. works out where each neuron sits, for the brain view,
+6. makes the charts,
+7. builds and opens the 3D page.
 
-More detail is in [`BrainTest1/README.md`](BrainTest1/README.md).
+Steps that are already done are skipped, so a second run takes a few seconds. `run_game.bat force` (from a terminal) redoes the simulation. More detail is in [`BrainTest1/README.md`](BrainTest1/README.md).
 
 <a name="test-2"></a>
 <img src="assets/readme/h-test-2.svg" alt="Test 2: Building Escape" height="56">

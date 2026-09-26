@@ -7,6 +7,7 @@ CC-BY, [male-cns.janelia.org](https://male-cns.janelia.org/)).
 |---|---|
 | [`connectivity-check/`](connectivity-check/) | Is there wiring between candidate echo-sensing neurons and the turning / walking neurons? Charts, a 3D anatomical view and a write-up. |
 | [`wall-dodge/`](wall-dodge/) | The first demo: a spiking circuit cut from the connectome steers a fly away from walls. Includes the interactive 3D replay. |
+| [`run_game.bat`](run_game.bat) | **Start here (Windows).** Double-click it: it runs every step needed, one after another, and opens the 3D game page. |
 | [`explore.py`](explore.py) | Ten-line look at the annotation and connection tables. |
 | [`download_data.py`](download_data.py) | Downloads the connectome tables into `data/` (not in git, they are ~23 GB). |
 | `requirements.txt` | Python packages (`pip install -r requirements.txt`). |
@@ -26,7 +27,13 @@ An interrupted download resumes when you run the command again.
 The data is not stored in this repository (`data/` is git-ignored). It is licensed CC-BY: please credit
 Janelia FlyEM and the Male CNS connectome team if you reuse it.
 
-## Order to run things
+## The quick way
+
+Double-click `run_game.bat` (or run it from a terminal). It installs the packages, downloads the data if missing,
+cuts the sub-circuit, runs the simulation, makes the charts and opens the 3D page. Finished steps are skipped, so a
+second run takes seconds; `run_game.bat force` redoes the simulation.
+
+## Or step by step
 
 1. `python download_data.py --core`
 2. `connectivity-check/scripts/run_check.py`, then `extra_graphs.py` (optional, for the wiring analysis)

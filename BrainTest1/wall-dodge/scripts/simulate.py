@@ -62,7 +62,7 @@ def run_trial(mode, gap_c, seed, record=False, gain=None):
                                                 scramble_eyes=(mode == "scrambled_eyes"), seed=seed)
     x, dna_l, dna_r = 0.0, 0.0, 0.0
     random_dir = rng.choice([-1.0, 1.0])
-    frames = []
+    frames, spikes = [], []
     for k in range(CTRL_PER_TRIAL):
         d = max(0.0, D_START - WALL_SPEED * k * CONTROL_MS / 1000.0)
         loom = looming(d)
@@ -78,6 +78,8 @@ def run_trial(mode, gap_c, seed, record=False, gain=None):
             vx = float(np.clip(STEER * (dna_r - dna_l), -V_MAX, V_MAX))
             sens_l, sens_r = hz[brain.sens_left].mean(), hz[brain.sens_right].mean()
             relay = hz[brain.role == 1].mean()
+            if record:
+                spikes.append(np.flatnonzero(cnt).tolist())
         else:
             vx = float(np.clip(3.0 * (random_dir * 6.0 - x), -V_MAX, V_MAX))
             sens_l = sens_r = relay = 0.0
@@ -86,7 +88,7 @@ def run_trial(mode, gap_c, seed, record=False, gain=None):
             frames.append([round(d, 2), round(x, 3), round(in_l, 1), round(in_r, 1), round(sens_l, 1), round(sens_r, 1),
                            round(relay, 1), round(dna_l, 1), round(dna_r, 1)])
     hit = abs(x - gap_c) > (GAP_W / 2 - FLY_HALF)
-    return hit, x, frames
+    return hit, x, frames, spikes
 
 
 def wilson(k, n, z=1.96):
@@ -108,10 +110,10 @@ def main():
         t0 = time.time()
         results, frames_out = [], []
         for i, g in enumerate(gaps):
-            hit, xf, frames = run_trial(mode, float(g), seed=1000 + i, record=i < DISPLAY_TRIALS)
+            hit, xf, frames, spikes = run_trial(mode, float(g), seed=1000 + i, record=i < DISPLAY_TRIALS)
             results.append((not hit, xf, g))
             if i < DISPLAY_TRIALS:
-                frames_out.append({"gap": round(float(g), 3), "dodged": bool(not hit), "final_x": round(xf, 3), "frames": frames})
+                frames_out.append({"gap": round(float(g), 3), "dodged": bool(not hit), "final_x": round(xf, 3), "frames": frames, "spikes": spikes})
         ok = int(sum(r[0] for r in results))
         left_gap = [r[0] for r in results if r[2] < 0]
         right_gap = [r[0] for r in results if r[2] > 0]

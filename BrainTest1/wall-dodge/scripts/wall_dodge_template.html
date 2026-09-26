@@ -5,110 +5,193 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Echo-Fly: Wall Dodge</title>
 <style>
-  :root { --ground:#1E181C; --panel:rgba(50,41,47,.86); --line:#4A3D46; --teal:#99E1D9; --text:#F4F1F3; --muted:#B9AEB5; --red:#FF8FA3; --green:#7be0a0; }
-  * { box-sizing: border-box; }
-  html, body { margin:0; height:100%; background:var(--ground); color:var(--text); font:13px/1.45 system-ui, "Segoe UI", sans-serif; overflow:hidden; }
+  :root {
+    --bg:#1E181C; --card:rgba(38,30,36,.80); --edge:rgba(255,255,255,.08); --text:#F4F1F3; --muted:#B9AEB5; --faint:#7d727a;
+    --teal:#99E1D9; --loom:#FF8FA3; --relay:#B8A9C9; --left:#FFD166; --right:#8AB4FF; --ok:#7be0a0; --bad:#FF8FA3;
+  }
+  * { box-sizing:border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--text); font:13px/1.45 system-ui, "Segoe UI", Roboto, sans-serif; overflow:hidden; }
   #stage { position:fixed; inset:0; }
   canvas { display:block; }
-  .panel { position:fixed; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:10px 12px; backdrop-filter:blur(4px); }
-  h1 { font-size:15px; margin:0 0 2px; letter-spacing:.06em; text-transform:uppercase; color:var(--teal); }
-  h2 { font-size:11px; margin:0 0 6px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); font-weight:600; }
-  .muted { color:var(--muted); }
-  #left { top:12px; left:12px; width:290px; }
-  #right { top:12px; right:12px; width:250px; }
-  #bottom { bottom:12px; left:50%; transform:translateX(-50%); display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:center; max-width:calc(100% - 24px); }
-  button, select, input[type=range] { font:inherit; color:var(--text); }
-  button, select { background:#251E23; border:1px solid var(--line); border-radius:5px; padding:5px 10px; cursor:pointer; }
-  button:hover, select:hover { border-color:var(--teal); }
-  label.chk { display:flex; gap:5px; align-items:center; cursor:pointer; }
-  .row { display:grid; grid-template-columns:78px 1fr 44px; gap:8px; align-items:center; margin:3px 0; font-variant-numeric:tabular-nums; }
-  .bar { height:8px; background:#251E23; border-radius:3px; overflow:hidden; }
-  .bar i { display:block; height:100%; width:0; background:var(--teal); }
-  .bar.dna i { background:#E9C46A; }
-  .bar.in i { background:var(--red); }
+  .small { font-size:12px; } .muted { color:var(--muted); } .faint { color:var(--faint); }
+  .col { position:fixed; top:16px; display:flex; flex-direction:column; gap:12px; max-height:calc(100vh - 100px); overflow:auto; scrollbar-width:none; }
+  .col::-webkit-scrollbar { display:none; }
+  #left { left:16px; width:300px; } #right { right:16px; width:344px; }
+  .card { background:var(--card); border:1px solid var(--edge); border-radius:14px; padding:14px 16px; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+  h1 { margin:0; font-size:19px; letter-spacing:.02em; font-weight:700; }
+  h1 span { color:var(--teal); }
+  h2 { margin:0; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); font-weight:600; }
+  .between { display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+  select { width:100%; margin-top:12px; background:#2a2229; color:var(--text); border:1px solid var(--edge); border-radius:9px; padding:8px 10px; font:inherit; cursor:pointer; }
+  select:hover, button:hover { border-color:rgba(153,225,217,.55); }
+  #modeDesc { margin:8px 0 0; }
+  #dots { display:flex; gap:6px; margin:10px 0 12px; flex-wrap:wrap; }
+  #dots span { width:15px; height:15px; border-radius:50%; background:#3a3037; cursor:pointer; box-shadow:inset 0 0 0 2px transparent; }
+  #dots span.ok { background:var(--ok); } #dots span.bad { background:var(--bad); }
+  #dots span.cur { box-shadow:inset 0 0 0 2px #fff, 0 0 0 2px rgba(255,255,255,.25); }
+  #mini { width:100%; height:auto; border-radius:9px; background:#241D22; }
+  .rows { display:grid; gap:9px; margin-top:12px; }
+  .r { display:grid; grid-template-columns:62px 1fr 52px; gap:10px; align-items:center; font-variant-numeric:tabular-nums; }
+  .track { height:8px; background:#2a2229; border-radius:99px; overflow:hidden; position:relative; }
+  .track i { position:absolute; top:0; bottom:0; left:0; width:0; border-radius:99px; background:var(--loom); }
   .val { text-align:right; }
-  #dots { display:flex; gap:5px; margin:6px 0 2px; flex-wrap:wrap; }
-  #dots span { width:14px; height:14px; border-radius:50%; background:#3a3037; border:2px solid transparent; cursor:pointer; }
-  #dots span.ok { background:var(--green); } #dots span.bad { background:var(--red); }
-  #dots span.cur { border-color:#fff; }
-  #banner { position:fixed; top:38%; left:50%; transform:translate(-50%,-50%); font-size:54px; font-weight:800; letter-spacing:.08em; text-shadow:0 0 24px #000; opacity:0; transition:opacity .2s; pointer-events:none; }
+  .meter { height:14px; background:#2a2229; border-radius:99px; position:relative; margin-top:12px; overflow:hidden; }
+  .meter::after { content:""; position:absolute; left:50%; top:-2px; bottom:-2px; width:2px; background:rgba(255,255,255,.35); }
+  #steerFill { position:absolute; top:0; bottom:0; border-radius:99px; }
+  .meterLabels { display:flex; justify-content:space-between; margin-top:5px; color:var(--faint); font-size:11px; }
+  #steerTxt { text-align:center; margin-top:2px; font-weight:600; }
+  #brainWrap { position:relative; margin-top:8px; height:250px; border-radius:10px; background:radial-gradient(ellipse at 50% 45%, #2b2229 0%, #211a1f 70%); overflow:hidden; }
+  #brainCanvas { width:100%; height:100%; cursor:grab; }
+  .corner { position:absolute; top:8px; font-size:11px; font-weight:700; color:var(--faint); letter-spacing:.1em; pointer-events:none; }
+  .corner.l { left:10px; } .corner.r { right:10px; }
+  #noBrain { position:absolute; inset:0; display:none; place-items:center; text-align:center; padding:24px; color:var(--muted); background:rgba(30,24,28,.72); pointer-events:none; }
+  .legend { display:flex; flex-wrap:wrap; gap:6px 14px; margin-top:10px; color:var(--muted); font-size:11.5px; }
+  .legend i { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; vertical-align:-1px; }
+  #trace { width:100%; height:auto; margin-top:8px; border-radius:8px; background:#241D22; }
+  details summary { cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:baseline; }
+  details summary::-webkit-details-marker { display:none; }
+  details summary::after { content:"show"; color:var(--faint); font-size:11px; }
+  details[open] summary::after { content:"hide"; }
+  .score { display:grid; grid-template-columns:1fr 90px 40px; gap:8px; align-items:center; margin-top:8px; font-size:12px; }
+  .score .track i { background:#5b4e57; } .score.sel { color:var(--teal); } .score.sel .track i { background:var(--teal); }
+  #bar { position:fixed; left:50%; bottom:16px; transform:translateX(-50%); display:flex; gap:6px; align-items:center; padding:8px 10px; border-radius:999px; background:var(--card); border:1px solid var(--edge); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); max-width:calc(100vw - 24px); }
+  button { font:inherit; color:var(--text); background:#2a2229; border:1px solid var(--edge); border-radius:999px; padding:7px 13px; cursor:pointer; white-space:nowrap; }
+  button.on { background:rgba(153,225,217,.16); border-color:rgba(153,225,217,.55); color:var(--teal); }
+  .sep { width:1px; height:22px; background:var(--edge); margin:0 4px; }
+  .seg { display:flex; gap:2px; } .seg button { padding:7px 10px; }
+  #banner { position:fixed; top:36%; left:50%; transform:translate(-50%,-50%); font-size:58px; font-weight:800; letter-spacing:.1em; text-shadow:0 0 28px #000; opacity:0; transition:opacity .2s; pointer-events:none; }
   #flash { position:fixed; inset:0; background:#ff2d55; opacity:0; pointer-events:none; }
-  table { width:100%; border-collapse:collapse; margin-top:4px; }
-  td { padding:2px 0; } td:last-child { text-align:right; font-variant-numeric:tabular-nums; }
-  tr.sel td { color:var(--teal); font-weight:700; }
-  #mini { display:block; width:100%; height:150px; background:#241D22; border-radius:6px; margin-top:6px; }
-  .note { font-size:11.5px; color:var(--muted); margin-top:8px; }
-  @media (max-width: 900px) { #right { display:none; } #left { width:250px; } }
+  #help { position:fixed; inset:0; background:rgba(20,15,19,.72); display:grid; place-items:center; z-index:20; backdrop-filter:blur(3px); }
+  #help[hidden] { display:none; }
+  #help .card { max-width:560px; max-height:86vh; overflow:auto; padding:22px 26px; background:rgba(40,32,38,.96); }
+  #help h1 { margin-bottom:10px; } #help p { margin:8px 0; } #help .warn { border-left:3px solid var(--left); padding-left:12px; color:var(--muted); }
+  body.nopanels .col { display:none; }
+  body.capturing #right { display:flex !important; }
+  body.capturing #brainWrap { height:300px; }
+  @media (max-width: 1080px) { #right { display:none; } }
+  @media (max-width: 720px) { #left { display:none; } #bar { flex-wrap:wrap; justify-content:center; border-radius:18px; } }
 </style>
-<script type="importmap">
-{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-               "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
-</script>
 </head>
 <body>
 <div id="stage"></div>
 <div id="flash"></div>
 <div id="banner"></div>
 
-<div class="panel" id="left">
-  <h1>Echo-Fly · Wall Dodge</h1>
-  <div class="muted">A fly stays in place. Walls fly at it. Only its brain wiring decides which way to dodge.</div>
-  <div style="margin-top:8px"><select id="mode"></select></div>
-  <div class="muted" id="modeDesc" style="margin-top:6px"></div>
-  <div id="dots"></div>
-  <div class="muted" id="trialInfo"></div>
-  <h2 style="margin-top:10px">What the eyes see (input)</h2>
-  <div class="row"><span>left eye</span><div class="bar in"><i id="inL"></i></div><span class="val" id="inLv"></span></div>
-  <div class="row"><span>right eye</span><div class="bar in"><i id="inR"></i></div><span class="val" id="inRv"></span></div>
-  <h2 style="margin-top:8px">Inside the brain (spikes / s)</h2>
-  <div class="row"><span>looming L</span><div class="bar"><i id="sL"></i></div><span class="val" id="sLv"></span></div>
-  <div class="row"><span>looming R</span><div class="bar"><i id="sR"></i></div><span class="val" id="sRv"></span></div>
-  <div class="row"><span>relays</span><div class="bar"><i id="rel"></i></div><span class="val" id="relv"></span></div>
-  <h2 style="margin-top:8px">Steering neurons (DNa)</h2>
-  <div class="row"><span>DNa left</span><div class="bar dna"><i id="dL"></i></div><span class="val" id="dLv"></span></div>
-  <div class="row"><span>DNa right</span><div class="bar dna"><i id="dR"></i></div><span class="val" id="dRv"></span></div>
+<aside id="left" class="col">
+  <section class="card">
+    <h1>Echo-Fly <span>Wall Dodge</span></h1>
+    <select id="mode" aria-label="Condition"></select>
+    <p id="modeDesc" class="small muted"></p>
+  </section>
+  <section class="card">
+    <div class="between"><h2>Wall</h2><span id="trialInfo" class="small muted"></span></div>
+    <div id="dots"></div>
+    <canvas id="mini" width="520" height="290"></canvas>
+  </section>
+  <section class="card">
+    <h2>Eyes to steering</h2>
+    <div class="rows">
+      <div class="r"><span>left eye</span><div class="track"><i id="inL"></i></div><span class="val" id="inLv"></span></div>
+      <div class="r"><span>right eye</span><div class="track"><i id="inR"></i></div><span class="val" id="inRv"></span></div>
+    </div>
+    <div class="meter"><i id="steerFill"></i></div>
+    <div class="meterLabels"><span>steers left</span><span>steers right</span></div>
+    <div id="steerTxt" class="small muted">&nbsp;</div>
+  </section>
+</aside>
+
+<aside id="right" class="col">
+  <section class="card">
+    <div class="between"><h2>Brain activity</h2><span id="spikeCount" class="small muted"></span></div>
+    <div id="brainWrap">
+      <canvas id="brainCanvas"></canvas>
+      <span class="corner l">LEFT</span><span class="corner r">RIGHT</span>
+      <div id="noBrain" class="small">No brain in this condition.<br>The fly just picks a side at random.</div>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--loom)"></i>looming (eyes)</span>
+      <span><i style="background:var(--relay)"></i>relays</span>
+      <span><i style="background:var(--left)"></i>steering (DNa)</span>
+    </div>
+    <div class="small faint" style="margin-top:6px">Each dot is a real neuron, drawn where it sits. It flashes when it fires. Drag to rotate.</div>
+  </section>
+  <section class="card">
+    <h2>Activity during this wall</h2>
+    <canvas id="trace" width="620" height="150"></canvas>
+    <div class="legend">
+      <span><i style="background:var(--loom)"></i>looming</span>
+      <span><i style="background:var(--relay)"></i>relays</span>
+      <span><i style="background:var(--left)"></i>DNa left</span>
+      <span><i style="background:var(--right)"></i>DNa right</span>
+    </div>
+  </section>
+  <section class="card">
+    <details id="scoresBox" open>
+      <summary><h2 id="scoresTitle">Results</h2></summary>
+      <div id="scores"></div>
+      <div class="small faint" style="margin-top:10px">Share of walls the fly got through. Chance is 50%.</div>
+    </details>
+  </section>
+</aside>
+
+<nav id="bar" aria-label="Controls">
+  <button id="prev" title="Previous wall (left arrow)">&#9664; Wall</button>
+  <button id="play" title="Play / pause (space)">Pause</button>
+  <button id="restart" title="Replay this wall">Replay</button>
+  <button id="next" title="Next wall (right arrow)">Wall &#9654;</button>
+  <span class="sep"></span>
+  <span class="seg" id="speed"><button data-s="0.25">0.25x</button><button data-s="0.5">0.5x</button><button data-s="1" class="on">1x</button><button data-s="2">2x</button></span>
+  <span class="sep"></span>
+  <button id="auto" class="on" title="Go to the next wall automatically">Auto</button>
+  <button id="panelsBtn" title="Hide or show the panels (H)">Panels</button>
+  <button id="helpBtn" title="What am I looking at? (?)">?</button>
+</nav>
+
+<div id="help" hidden>
+  <div class="card">
+    <h1>What you are looking at</h1>
+    <p>A fly hovers in place. Walls fly at it, and each wall has its <b>left or right side open</b>. The fly can only steer sideways, and it is steered by a simulated piece of a <b>real fly brain</b>.</p>
+    <p><b>Eyes:</b> the more wall a fly sees on one side, and the closer it gets, the harder that eye's looming neurons are driven.</p>
+    <p><b>Brain activity:</b> 820 neurons cut out of the male fly connectome, drawn where they really sit. A dot flashes when the neuron fires; lines show its strongest connections lighting up.</p>
+    <p><b>Steering:</b> if the right steering neurons (DNa) fire more than the left ones, the fly moves right, and the other way round.</p>
+    <p><b>Conditions:</b> the controls swap or scramble the eyes, or use no brain at all, to test whether the real wiring is what makes the dodge work.</p>
+    <p class="warn">Assumption: we treat a DNa neuron as turning the fly toward its own side. We have not tested this, and the result depends on it. The eyes see a simple looming signal, not sonar. These are recorded simulation runs, not a live fly.</p>
+    <p class="small faint">Keys: space = pause, left/right arrows = wall, H = hide panels, ? = this help, Esc = close.</p>
+    <p><button id="helpClose">Close</button></p>
+  </div>
 </div>
 
-<div class="panel" id="right">
-  <h2>Top-down view</h2>
-  <canvas id="mini" width="460" height="300"></canvas>
-  <h2 style="margin-top:10px">Result over all test walls</h2>
-  <table id="scores"></table>
-  <div class="note" id="scoreNote"></div>
-</div>
-
-<div class="panel" id="bottom">
-  <button id="play">Pause</button>
-  <button id="prev">&larr; Prev wall</button>
-  <button id="restart">Replay</button>
-  <button id="hide">Hide panels</button>
-  <button id="next">Next wall &rarr;</button>
-  <label class="chk"><input type="checkbox" id="auto" checked> auto-next</label>
-  <label class="chk">speed <input type="range" id="speed" min="0.25" max="2" step="0.25" value="1"><span id="speedv">1x</span></label>
-  <span class="muted">drag = rotate view, wheel = zoom, space = pause, H = hide panels</span>
-</div>
-
+<script>/*__THREE__*/</script>
+<script>
+function showProblem(msg) {
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);max-width:80%;background:#5a1f2b;color:#fff;padding:16px 20px;border-radius:8px;font:14px system-ui,sans-serif;z-index:99';
+  d.textContent = msg; document.body.appendChild(d);
+}
+addEventListener('error', e => showProblem('Something went wrong in the page: ' + e.message));
+if (!window.THREE || !window.OrbitControls) showProblem('The 3D library did not load. Try another browser (Chrome, Edge or Firefox).');
+else if (!document.createElement('canvas').getContext('webgl2') && !document.createElement('canvas').getContext('webgl')) showProblem('This browser has WebGL turned off, so the 3D scene cannot be drawn. Enable hardware acceleration or try another browser.');
+</script>
 <script type="module">
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
+const THREE = window.THREE, OrbitControls = window.OrbitControls;
 const DATA = /*__DATA__*/null;
-const MODES = {
-  brain: { label: 'Real connectome wiring', desc: 'The looming neurons of each eye feed the real fly wiring; the difference in left vs right steering-neuron firing steers the fly.' },
-  swapped: { label: 'Control: eyes wired to the opposite side', desc: 'Same brain, but the left eye is plugged into the right side of the brain and vice versa.' },
-  scrambled_eyes: { label: 'Control: eyes scrambled', desc: 'Same brain, but every looming neuron is randomly assigned to the left or right eye.' },
-  random: { label: 'Baseline: no brain, random side', desc: 'No brain at all: the fly just picks left or right at random. This is the chance level.' },
-};
-const CTRL = DATA.control_ms / 1000;
-const P = DATA.params;
-const GAPC_HALF = P.GAP_W / 2;
-const state = { mode: 'brain', trial: 0, t: 0, playing: true, speed: 1, fired: false, hold: 0 };
+const LAY = DATA.layout;
+const $ = id => document.getElementById(id);
 
-// ---------- scene ----------
-const stage = document.getElementById('stage');
+const MODES = {
+  brain: { label: 'Real connectome wiring', short: 'Real wiring', desc: 'Each eye feeds the real fly wiring. If the right steering neurons fire more than the left, the fly moves right.' },
+  swapped: { label: 'Control: eyes wired to the opposite side', short: 'Eyes swapped', desc: 'Same brain, but the left eye is plugged into the right side of the brain and the right eye into the left.' },
+  scrambled_eyes: { label: 'Control: eyes scrambled', short: 'Eyes scrambled', desc: 'Same brain, but every looming neuron is randomly given the left or right eye.' },
+  random: { label: 'Baseline: no brain, random side', short: 'No brain', desc: 'No brain at all: the fly just picks a side at random. This is the chance level.' },
+};
+const CTRL = DATA.control_ms / 1000, P = DATA.params, GAPC_HALF = P.GAP_W / 2;
+const state = { mode: 'brain', trial: 0, t: 0, playing: true, speed: 1, fired: false, hold: 0, auto: true };
+const C = { loom: '#FF8FA3', relay: '#B8A9C9', left: '#FFD166', right: '#8AB4FF' };
+
+// ================= main 3D scene: the fly and the wall =================
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-stage.appendChild(renderer.domElement);
+$('stage').appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x1E181C);
 scene.fog = new THREE.Fog(0x1E181C, 45, 120);
@@ -122,7 +205,6 @@ controls.update();
 scene.add(new THREE.AmbientLight(0xffffff, 0.55));
 const sun = new THREE.DirectionalLight(0xffffff, 1.0); sun.position.set(6, 12, 8); scene.add(sun);
 const fill = new THREE.PointLight(0x99E1D9, 5, 30); fill.position.set(0, 3, -4); scene.add(fill);
-
 const grid = new THREE.GridHelper(120, 120, 0x4A3D46, 0x32292F); grid.position.y = -2.5; scene.add(grid);
 
 function makeFly() {
@@ -170,8 +252,7 @@ function buildWall(gapC) {
   const H = 7, y0 = -2.5, depth = 0.7;
   const solid = new THREE.MeshStandardMaterial({ color: 0x3c8f86, emissive: 0x2aa398, emissiveIntensity: 0.55, roughness: 0.6 });
   const edge = new THREE.LineBasicMaterial({ color: 0x99E1D9 });
-  const segs = [[-40, gapC - GAPC_HALF], [gapC + GAPC_HALF, 40]];
-  for (const [a, b] of segs) {
+  for (const [a, b] of [[-40, gapC - GAPC_HALF], [gapC + GAPC_HALF, 40]]) {
     if (b - a <= 0.01) continue;
     const box = new THREE.Mesh(new THREE.BoxGeometry(b - a, H, depth), solid);
     box.position.set((a + b) / 2, y0 + H / 2, 0); wallGroup.add(box);
@@ -179,14 +260,12 @@ function buildWall(gapC) {
     lines.position.copy(box.position); wallGroup.add(lines);
   }
   for (const x of [gapC - GAPC_HALF, gapC + GAPC_HALF]) {
-    const post = new THREE.Mesh(new THREE.BoxGeometry(0.14, H, depth + 0.1),
-      new THREE.MeshBasicMaterial({ color: 0x99E1D9 }));
+    const post = new THREE.Mesh(new THREE.BoxGeometry(0.14, H, depth + 0.1), new THREE.MeshBasicMaterial({ color: 0x99E1D9 }));
     post.position.set(x, y0 + H / 2, 0); wallGroup.add(post);
   }
   scene.add(wallGroup);
 }
 
-// particles for a crash
 const particles = [];
 function burst(color) {
   for (let i = 0; i < 46; i++) {
@@ -202,22 +281,107 @@ function okRing() {
   ring.position.copy(fly.group.position); scene.add(ring); ring.userData.life = 1;
 }
 
-// ---------- ui ----------
-const $ = id => document.getElementById(id);
+// ================= brain panel: the 820 neurons at their real places =================
+const bCanvas = $('brainCanvas');
+const bRenderer = new THREE.WebGLRenderer({ canvas: bCanvas, antialias: true, alpha: true });
+bRenderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+bRenderer.setClearColor(0x000000, 0);
+const bScene = new THREE.Scene();
+const bCam = new THREE.PerspectiveCamera(34, 1, 10, 4000);
+bCam.position.set(0, 10, 800);
+const bControls = new OrbitControls(bCam, bCanvas);
+bControls.enablePan = false; bControls.enableDamping = true; bControls.minDistance = 250; bControls.maxDistance = 1500;
+const brainGroup = new THREE.Group(); bScene.add(brainGroup);
+
+const N = LAY.n;
+const roleColor = [new THREE.Color(C.loom), new THREE.Color(C.relay), new THREE.Color(C.left)];
+const roleSize = [6.2, 5.0, 15];
+const med = a => { const s = [...a].sort((p, q) => p - q); return s[s.length >> 1]; };
+const pct = (a, q) => { const s = [...a].sort((p, q2) => p - q2); return s[Math.floor(q * (s.length - 1))]; };
+const off = [0, 1, 2].map(k => med(LAY.pos.map(p => p[k])));
+const P3 = LAY.pos.map(p => [p[0] - off[0], p[1] - off[1], p[2] - off[2]]);
+const halfW = pct(P3.map(p => Math.abs(p[0])), 0.95), halfH = pct(P3.map(p => Math.abs(p[1])), 0.95);
+const pPos = new Float32Array(N * 3), pCol = new Float32Array(N * 3), pSize = new Float32Array(N), pAct = new Float32Array(N);
+for (let i = 0; i < N; i++) {
+  pPos.set(P3[i], i * 3);
+  const c = roleColor[LAY.role[i]]; pCol.set([c.r, c.g, c.b], i * 3);
+  pSize[i] = roleSize[LAY.role[i]];
+}
+const pGeo = new THREE.BufferGeometry();
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+pGeo.setAttribute('aColor', new THREE.BufferAttribute(pCol, 3));
+pGeo.setAttribute('aSize', new THREE.BufferAttribute(pSize, 1));
+const actAttr = new THREE.BufferAttribute(pAct, 1); actAttr.setUsage(THREE.DynamicDrawUsage);
+pGeo.setAttribute('aAct', actAttr);
+const pMat = new THREE.ShaderMaterial({
+  transparent: true, depthWrite: false,
+  uniforms: { uScale: { value: 950 * bRenderer.getPixelRatio() } },
+  vertexShader: `attribute vec3 aColor; attribute float aAct; attribute float aSize; varying vec3 vColor; varying float vAct; uniform float uScale;
+    void main(){ vColor = aColor; vAct = aAct; vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      gl_PointSize = aSize * (1.0 + 3.2 * aAct) * uScale / -mv.z; gl_Position = projectionMatrix * mv; }`,
+  fragmentShader: `varying vec3 vColor; varying float vAct;
+    void main(){ float d = length(gl_PointCoord - 0.5); if (d > 0.5) discard;
+      float soft = smoothstep(0.5, 0.12, d);
+      vec3 col = mix(vColor * 0.75, vec3(1.0), vAct * 0.8);
+      float a = (0.38 + 0.62 * vAct) * soft; gl_FragColor = vec4(col, clamp(a * 1.5, 0.0, 1.0)); }`,
+});
+brainGroup.add(new THREE.Points(pGeo, pMat));
+
+const E = LAY.edges, ePos = new Float32Array(E.length * 6), eCol = new Float32Array(E.length * 6);
+E.forEach(([a, b], k) => { ePos.set(P3[a], k * 6); ePos.set(P3[b], k * 6 + 3); });
+const eGeo = new THREE.BufferGeometry();
+eGeo.setAttribute('position', new THREE.BufferAttribute(ePos, 3));
+const eAttr = new THREE.BufferAttribute(eCol, 3); eAttr.setUsage(THREE.DynamicDrawUsage);
+eGeo.setAttribute('color', eAttr);
+brainGroup.add(new THREE.LineSegments(eGeo, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.5, depthWrite: false })));
+const EXC = [0.10, 0.17, 0.17], INH = [0.21, 0.10, 0.15], EXC_HI = [0.5, 0.95, 0.9], INH_HI = [1.0, 0.5, 0.65];
+
+const act = new Float32Array(N), TAU_FRAMES = 4, WINDOW = 14;
+function computeActivity(spikes, f) {
+  act.fill(0);
+  if (!spikes) return 0;
+  const i0 = Math.floor(f);
+  for (let k = Math.max(0, i0 - WINDOW); k <= Math.min(spikes.length - 1, i0); k++) {
+    const w = Math.exp(-(f - k) / TAU_FRAMES), list = spikes[k];
+    for (let j = 0; j < list.length; j++) if (w > act[list[j]]) act[list[j]] = w;
+  }
+  let firing = 0; for (let i = 0; i < N; i++) if (act[i] > 0.45) firing++;
+  return firing;
+}
+function paintBrain() {
+  pAct.set(act); actAttr.needsUpdate = true;
+  E.forEach(([a, , , sg], k) => {
+    const t = act[a], lo = sg < 0 ? INH : EXC, hi = sg < 0 ? INH_HI : EXC_HI;
+    for (let v = 0; v < 2; v++) for (let c = 0; c < 3; c++) eCol[k * 6 + v * 3 + c] = lo[c] + (hi[c] - lo[c]) * t;
+  });
+  eAttr.needsUpdate = true;
+}
+let brainFitted = false;
+function sizeBrain() {
+  const w = $('brainWrap').clientWidth, h = $('brainWrap').clientHeight;
+  if (!w || !h) return;
+  bRenderer.setSize(w, h, false); bCam.aspect = w / h; bCam.updateProjectionMatrix();
+  if (!brainFitted) {
+    const tn = Math.tan(bCam.fov * Math.PI / 360);
+    bCam.position.set(0, 0, 1.08 * Math.max(halfH / tn, halfW / (tn * bCam.aspect)) + 40);
+    brainFitted = true;
+  }
+}
+new ResizeObserver(sizeBrain).observe($('brainWrap'));
+
+// ================= interface =================
 const modeSel = $('mode');
 for (const k of Object.keys(MODES)) { const o = document.createElement('option'); o.value = k; o.textContent = MODES[k].label; modeSel.appendChild(o); }
 
-function fmtPct(v) { return (v * 100).toFixed(0) + '%'; }
 function buildScores() {
-  const t = $('scores'); t.innerHTML = '';
+  const box = $('scores'); box.innerHTML = '';
+  $('scoresTitle').textContent = `Results over ${DATA.summary.n_trials} walls`;
   for (const k of Object.keys(MODES)) {
     const m = DATA.summary.modes[k]; if (!m) continue;
-    const tr = document.createElement('tr'); if (k === state.mode) tr.className = 'sel';
-    tr.innerHTML = `<td>${MODES[k].label.replace('Control: ', '').replace('Baseline: ', '')}</td><td>${fmtPct(m.accuracy)}</td>`;
-    t.appendChild(tr);
+    const row = document.createElement('div'); row.className = 'score' + (k === state.mode ? ' sel' : '');
+    row.innerHTML = `<span>${MODES[k].short}</span><div class="track"><i style="width:${m.accuracy * 100}%"></i></div><span class="val">${Math.round(m.accuracy * 100)}%</span>`;
+    box.appendChild(row);
   }
-  const n = DATA.summary.n_trials;
-  $('scoreNote').textContent = `Dodged = the fly fits through the gap. ${n} random walls per row (left or right gap). Chance is 50%. The 12 walls you can replay here are the first 12 of them.`;
 }
 function buildDots() {
   const box = $('dots'); box.innerHTML = '';
@@ -226,13 +390,14 @@ function buildDots() {
     s.onclick = () => setTrial(i); box.appendChild(s);
   });
 }
-function markDots() { [...$('dots').children].forEach((s, i) => s.classList.toggle('cur', i === state.trial)); }
+const markDots = () => [...$('dots').children].forEach((s, i) => s.classList.toggle('cur', i === state.trial));
 
 function setMode(m) { state.mode = m; state.trial = 0; modeSel.value = m; $('modeDesc').textContent = MODES[m].desc; buildDots(); buildScores(); setTrial(0); }
 function setTrial(i) {
   const list = DATA.modes[state.mode]; state.trial = (i + list.length) % list.length; state.t = 0; state.fired = false; state.hold = 0;
   const tr = list[state.trial]; buildWall(tr.gap); markDots();
-  $('trialInfo').textContent = `wall ${state.trial + 1} of ${list.length} · gap is on the ${tr.gap > 0 ? 'RIGHT' : 'LEFT'}`;
+  $('trialInfo').textContent = `wall ${state.trial + 1} of ${list.length} · open side: ${tr.gap > 0 ? 'RIGHT' : 'LEFT'}`;
+  $('noBrain').style.display = tr.spikes ? 'none' : 'grid';
   $('banner').style.opacity = 0;
   particles.splice(0).forEach(p => scene.remove(p.m));
 }
@@ -241,73 +406,106 @@ $('play').onclick = () => { state.playing = !state.playing; $('play').textConten
 $('prev').onclick = () => setTrial(state.trial - 1);
 $('next').onclick = () => setTrial(state.trial + 1);
 $('restart').onclick = () => setTrial(state.trial);
-function togglePanels(force) { const hide = force ?? $('left').style.display !== 'none'; $('left').style.display = $('right').style.display = hide ? 'none' : ''; $('hide').textContent = hide ? 'Show panels' : 'Hide panels'; }
-$('hide').onclick = () => togglePanels();
-$('speed').oninput = e => { state.speed = +e.target.value; $('speedv').textContent = state.speed + 'x'; };
-addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); $('play').click(); } if (e.code === 'KeyH') togglePanels(); if (e.code === 'ArrowRight') $('next').click(); if (e.code === 'ArrowLeft') $('prev').click(); });
+$('auto').onclick = () => { state.auto = !state.auto; $('auto').classList.toggle('on', state.auto); };
+function togglePanels(force) { const hide = force ?? !document.body.classList.contains('nopanels'); document.body.classList.toggle('nopanels', hide); $('panelsBtn').classList.toggle('on', !hide); }
+$('panelsBtn').onclick = () => togglePanels(); $('panelsBtn').classList.add('on');
+function setSpeed(s) { state.speed = s; [...$('speed').children].forEach(b => b.classList.toggle('on', +b.dataset.s === s)); }
+[...$('speed').children].forEach(b => b.onclick = () => setSpeed(+b.dataset.s));
+const toggleHelp = force => { $('help').hidden = force ?? !$('help').hidden; };
+$('helpBtn').onclick = () => toggleHelp(); $('helpClose').onclick = () => toggleHelp(true);
+$('help').onclick = e => { if (e.target === $('help')) toggleHelp(true); };
+addEventListener('keydown', e => {
+  if (e.code === 'Space') { e.preventDefault(); $('play').click(); }
+  else if (e.code === 'KeyH') togglePanels();
+  else if (e.code === 'ArrowRight') $('next').click();
+  else if (e.code === 'ArrowLeft') $('prev').click();
+  else if (e.key === '?') toggleHelp();
+  else if (e.code === 'Escape') toggleHelp(true);
+});
 
-function bar(id, v, max, unit = '') { $(id).style.width = Math.max(0, Math.min(100, v / max * 100)) + '%'; if ($(id + 'v')) $(id + 'v').textContent = Math.round(v) + unit; }
+function setBar(id, v, max, unit = '') { $(id).style.width = Math.max(0, Math.min(100, v / max * 100)) + '%'; if ($(id + 'v')) $(id + 'v').textContent = Math.round(v) + unit; }
+function setSteer(dL, dR) {
+  const v = Math.max(-1, Math.min(1, (dR - dL) / 60)), el = $('steerFill');
+  if (v >= 0) { el.style.left = '50%'; el.style.right = ''; el.style.background = C.right; } else { el.style.right = '50%'; el.style.left = ''; el.style.background = C.left; }
+  el.style.width = Math.abs(v) * 50 + '%';
+  $('steerTxt').textContent = Math.abs(v) < 0.06 ? 'not steering' : v > 0 ? 'steering RIGHT' : 'steering LEFT';
+  $('steerTxt').style.color = Math.abs(v) < 0.06 ? '' : v > 0 ? C.right : C.left;
+}
 
 const mini = $('mini'), mctx = mini.getContext('2d');
 function drawMini(d, x, gapC, dodged, finished) {
-  const W = mini.width, H = mini.height, X = v => W / 2 + v / 16 * (W / 2), Y = v => H - 26 - v / 62 * (H - 40);
+  const W = mini.width, H = mini.height, X = v => W / 2 + v / 16 * (W / 2), Y = v => H - 30 - v / 62 * (H - 46);
   mctx.clearRect(0, 0, W, H);
   mctx.fillStyle = '#241D22'; mctx.fillRect(0, 0, W, H);
   mctx.strokeStyle = '#3a3037'; mctx.beginPath(); mctx.moveTo(W / 2, 0); mctx.lineTo(W / 2, H); mctx.stroke();
   const y = Y(Math.max(d, -1.5));
-  mctx.fillStyle = '#2c8f86'; mctx.fillRect(X(-16), y - 6, X(gapC - GAPC_HALF) - X(-16), 12); mctx.fillRect(X(gapC + GAPC_HALF), y - 6, X(16) - X(gapC + GAPC_HALF), 12);
-  mctx.fillStyle = 'rgba(123,224,160,.25)'; mctx.fillRect(X(gapC - GAPC_HALF), y - 6, X(gapC + GAPC_HALF) - X(gapC - GAPC_HALF), 12);
+  mctx.fillStyle = '#2c8f86'; mctx.fillRect(X(-16), y - 7, X(gapC - GAPC_HALF) - X(-16), 14); mctx.fillRect(X(gapC + GAPC_HALF), y - 7, X(16) - X(gapC + GAPC_HALF), 14);
+  mctx.fillStyle = 'rgba(123,224,160,.22)'; mctx.fillRect(X(gapC - GAPC_HALF), y - 7, X(gapC + GAPC_HALF) - X(gapC - GAPC_HALF), 14);
   mctx.fillStyle = finished && !dodged ? '#FF8FA3' : '#FFD166';
-  mctx.beginPath(); mctx.moveTo(X(x), Y(0) - 10); mctx.lineTo(X(x) - 8, Y(0) + 8); mctx.lineTo(X(x) + 8, Y(0) + 8); mctx.closePath(); mctx.fill();
-  mctx.fillStyle = '#B9AEB5'; mctx.font = '11px system-ui'; mctx.fillText('wall', 6, 14); mctx.fillText('fly', 6, H - 8);
+  mctx.beginPath(); mctx.moveTo(X(x), Y(0) - 12); mctx.lineTo(X(x) - 9, Y(0) + 9); mctx.lineTo(X(x) + 9, Y(0) + 9); mctx.closePath(); mctx.fill();
+  mctx.fillStyle = '#7d727a'; mctx.font = '12px system-ui'; mctx.fillText('wall', 8, 16); mctx.fillText('fly', 8, H - 8);
+}
+
+const trace = $('trace'), tctx = trace.getContext('2d');
+function drawTrace(tr, tt) {
+  const W = trace.width, H = trace.height, m = { l: 10, r: 10, t: 10, b: 18 }, fr = tr.frames, n = fr.length;
+  tctx.clearRect(0, 0, W, H); tctx.fillStyle = '#241D22'; tctx.fillRect(0, 0, W, H);
+  let mx = 30; for (const f of fr) mx = Math.max(mx, (f[4] + f[5]) / 2, f[6], f[7], f[8]);
+  const X = i => m.l + i / (n - 1) * (W - m.l - m.r), Y = v => H - m.b - v / mx * (H - m.t - m.b);
+  tctx.strokeStyle = '#3a3037'; tctx.lineWidth = 1; tctx.beginPath(); tctx.moveTo(m.l, H - m.b); tctx.lineTo(W - m.r, H - m.b); tctx.stroke();
+  const line = (get, color) => { tctx.strokeStyle = color; tctx.lineWidth = 2; tctx.beginPath(); fr.forEach((f, i) => { const x = X(i), y = Y(get(f)); i ? tctx.lineTo(x, y) : tctx.moveTo(x, y); }); tctx.stroke(); };
+  line(f => (f[4] + f[5]) / 2, C.loom); line(f => f[6], C.relay); line(f => f[7], C.left); line(f => f[8], C.right);
+  const cx = X(Math.min(n - 1, Math.max(0, tt / CTRL)));
+  tctx.strokeStyle = 'rgba(255,255,255,.75)'; tctx.lineWidth = 1.5; tctx.beginPath(); tctx.moveTo(cx, m.t); tctx.lineTo(cx, H - m.b); tctx.stroke();
+  tctx.fillStyle = '#7d727a'; tctx.font = '12px system-ui'; tctx.fillText('time →', m.l, H - 4); tctx.textAlign = 'right'; tctx.fillText(`${Math.round(mx)} spikes/s`, W - m.r, m.t + 10); tctx.textAlign = 'start';
 }
 
 function frameAt(frames, t) {
-  const f = t / CTRL, i = Math.min(frames.length - 1, Math.floor(f)), j = Math.min(frames.length - 1, i + 1), a = Math.min(1, f - i);
+  const f = Math.max(0, t / CTRL), i = Math.min(frames.length - 1, Math.floor(f)), j = Math.min(frames.length - 1, i + 1), a = Math.min(1, f - i);
   return frames[i].map((v, k) => v + (frames[j][k] - v) * a);
 }
 
-// ---------- loop ----------
-let last = performance.now(), prevX = 0;
-function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+// ================= loop =================
+let last = performance.now(), prevX = 0, cur = {};
+function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); sizeBrain(); }
 addEventListener('resize', resize); resize();
 
-let cur = {};
 function update(dt, now) {
   const tr = DATA.modes[state.mode][state.trial], T = tr.frames.length * CTRL;
-  if (state.playing) state.t += dt * state.speed;
-
+  if (state.playing) state.t = Math.max(0, state.t + dt * state.speed);
   const tt = Math.min(state.t, T - 1e-6);
-  const fr = frameAt(tr.frames, tt);
-  const [d, x, inL, inR, sL, sR, rel, dL, dR] = fr;
+  const [d, x, inL, inR, sL, sR, rel, dL, dR] = frameAt(tr.frames, tt);
   const finished = state.t >= T;
 
   let wallD = d;
   if (finished) wallD = tr.dodged ? -(state.t - T) * P.WALL_SPEED : 0;
+  if (!tr.dodged) wallD = Math.max(wallD, 0.9);
   wallGroup.position.z = -wallD;
   const vx = (x - prevX) / Math.max(dt, 1e-3); prevX = x;
   fly.group.position.set(x, 0, 0);
   fly.group.rotation.z += ((-Math.max(-14, Math.min(14, vx)) * 0.05) - fly.group.rotation.z) * 0.2;
   fly.group.position.y = Math.sin(now / 900) * 0.05 + (finished && !tr.dodged ? -Math.min(1.6, (state.t - T) * 2.5) : 0);
-  if (finished && !tr.dodged) fly.group.rotation.x = Math.min(1.4, (state.t - T) * 4);
-  else fly.group.rotation.x = 0;
+  fly.group.rotation.x = finished && !tr.dodged ? Math.min(1.4, (state.t - T) * 4) : 0;
   for (const w of fly.wings) w.pivot.rotation.z = w.s * (0.25 + 0.75 * Math.sin(now / 1000 * 2 * Math.PI * 9));
 
-  bar('inL', inL, 150, ' Hz'); bar('inR', inR, 150, ' Hz');
-  bar('sL', sL, 60); bar('sR', sR, 60); bar('rel', rel, 60);
-  bar('dL', dL, 100); bar('dR', dR, 100);
+  setBar('inL', inL, 150, ' Hz'); setBar('inR', inR, 150, ' Hz'); setSteer(dL, dR);
   drawMini(wallD, x, tr.gap, tr.dodged, finished);
+  drawTrace(tr, tt);
   cur = { tr, inL, inR, dL, dR, x, wallD, finished };
+
+  const firing = computeActivity(tr.spikes, state.t / CTRL);
+  paintBrain();
+  cur.firing = firing;
+  $('spikeCount').textContent = tr.spikes ? `${firing} firing now` : '';
+  brainGroup.rotation.y = 0.45 * Math.sin(now / 3800);
+  bControls.update(); bRenderer.render(bScene, bCam);
 
   if (finished && !state.fired) {
     state.fired = true;
     const b = $('banner'); b.textContent = tr.dodged ? 'DODGED' : 'HIT'; b.style.color = tr.dodged ? '#7be0a0' : '#FF8FA3'; b.style.opacity = 1;
     if (tr.dodged) okRing(); else { burst(0xFF8FA3); const f = $('flash'); f.style.transition = 'none'; f.style.opacity = .35; requestAnimationFrame(() => { f.style.transition = 'opacity .6s'; f.style.opacity = 0; }); }
   }
-  if (finished && state.playing) {
-    state.hold += dt * state.speed;
-    if (state.hold > 1.6 && $('auto').checked) setTrial(state.trial + 1);
-  }
+  if (finished && state.playing) { state.hold += dt * state.speed; if (state.hold > 1.6 && state.auto) setTrial(state.trial + 1); }
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i]; p.life -= dt * 0.9; p.v.y -= 9 * dt; p.m.position.addScaledVector(p.v, dt); p.m.material.opacity = Math.max(0, p.life);
     if (p.life <= 0) { scene.remove(p.m); particles.splice(i, 1); }
@@ -320,41 +518,66 @@ function update(dt, now) {
   renderer.render(scene, camera);
 }
 function tick(now) {
-  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  const dt = Math.max(0, Math.min(0.05, (now - last) / 1000)); last = now;
   update(dt, now);
   requestAnimationFrame(tick);
 }
 
-// ---------- GIF capture (used by scripts/capture_gifs.py): #capture=name:mode:trial ----------
+// ================= GIF capture (scripts/capture_gifs.py): #capture=name:mode:trial =================
+const SCENE_W = 550;
+function card(c, x, y, w, h) {
+  c.fillStyle = 'rgba(52,43,50,.95)'; c.beginPath();
+  if (c.roundRect) c.roundRect(x, y, w, h, 10); else c.rect(x, y, w, h);
+  c.fill();
+}
 function drawOverlay(c, w, h, mode, trial) {
-  const k = cur, s = w / 640;
-  c.textAlign = 'start'; c.font = `${13 * s}px system-ui, sans-serif`;
-  c.fillStyle = 'rgba(36,29,34,.8)'; c.fillRect(10 * s, 10 * s, 290 * s, 44 * s);
-  c.fillStyle = '#99E1D9'; c.fillText(MODES[mode].label, 18 * s, 28 * s);
-  c.fillStyle = '#B9AEB5'; c.fillText(`wall ${trial + 1} \u00b7 open side is the ${k.tr.gap > 0 ? 'RIGHT' : 'LEFT'}`, 18 * s, 46 * s);
-  const bars = [['left eye', k.inL, 150, '#FF8FA3'], ['right eye', k.inR, 150, '#FF8FA3'], ['DNa left', k.dL, 100, '#E9C46A'], ['DNa right', k.dR, 100, '#E9C46A']];
-  c.fillStyle = 'rgba(36,29,34,.8)'; c.fillRect(10 * s, h - 98 * s, 230 * s, 88 * s);
+  const k = cur, x0 = SCENE_W + 8, cw = w - SCENE_W - 16;
+  c.textAlign = 'start'; c.shadowBlur = 0;
+  c.fillStyle = '#1E181C'; c.fillRect(SCENE_W, 0, w - SCENE_W, h);
+
+  card(c, x0, 8, cw, 46);
+  c.font = '600 13px system-ui, sans-serif'; c.fillStyle = '#99E1D9'; c.fillText(MODES[mode].short, x0 + 12, 28);
+  c.font = '12px system-ui, sans-serif'; c.fillStyle = '#B9AEB5'; c.fillText(`wall ${trial + 1} \u00b7 open side: ${k.tr.gap > 0 ? 'RIGHT' : 'LEFT'}`, x0 + 12, 45);
+
+  card(c, x0, 62, cw, 250);
+  c.font = '600 11px system-ui, sans-serif'; c.fillStyle = '#B9AEB5'; c.fillText('BRAIN ACTIVITY', x0 + 12, 80);
+  c.textAlign = 'right'; c.font = '12px system-ui, sans-serif';
+  c.fillText(k.tr.spikes ? `${k.firing} neurons firing` : 'no brain', x0 + cw - 12, 80); c.textAlign = 'start';
+  if (bCanvas.width > 0 && bCanvas.height > 0) {
+    const bw = cw - 16, bh = Math.min(216, bw * bCanvas.height / bCanvas.width);
+    c.drawImage(bCanvas, x0 + 8, 90, bw, bh);
+  }
+
+  card(c, x0, 320, cw, 122);
+  const bars = [['left eye', k.inL, 150, C.loom], ['right eye', k.inR, 150, C.loom], ['DNa left', k.dL, 100, C.left], ['DNa right', k.dR, 100, C.right]];
+  c.font = '12px system-ui, sans-serif';
   bars.forEach(([lab, v, max, col], i) => {
-    const y = h - 84 * s + i * 20 * s;
-    c.fillStyle = '#B9AEB5'; c.fillText(lab, 18 * s, y + 9 * s);
-    c.fillStyle = '#3a3037'; c.fillRect(85 * s, y, 140 * s, 9 * s);
-    c.fillStyle = col; c.fillRect(85 * s, y, 140 * s * Math.max(0, Math.min(1, v / max)), 9 * s);
+    const y = 336 + i * 21;
+    c.fillStyle = '#B9AEB5'; c.fillText(lab, x0 + 12, y + 9);
+    c.fillStyle = '#3a3037'; c.fillRect(x0 + 78, y, cw - 96, 9);
+    c.fillStyle = col; c.fillRect(x0 + 78, y, (cw - 96) * Math.max(0, Math.min(1, v / max)), 9);
   });
-  drawMini(k.wallD, k.x, k.tr.gap, k.tr.dodged, k.finished);
-  c.drawImage($('mini'), w - 170 * s, 10 * s, 160 * s, 104 * s);
+  const st = Math.max(-1, Math.min(1, (k.dR - k.dL) / 60));
+  c.textAlign = 'center'; c.font = '600 12px system-ui, sans-serif';
+  c.fillStyle = Math.abs(st) < 0.06 ? '#7d727a' : st > 0 ? C.right : C.left;
+  c.fillText(Math.abs(st) < 0.06 ? 'not steering' : st > 0 ? 'steering RIGHT' : 'steering LEFT', x0 + cw / 2, 432); c.textAlign = 'start';
+
   if (k.finished) {
-    c.font = `800 ${54 * s}px system-ui, sans-serif`; c.textAlign = 'center';
-    c.shadowColor = '#000'; c.shadowBlur = 18 * s;
-    c.fillStyle = k.tr.dodged ? '#7be0a0' : '#FF8FA3';
-    c.fillText(k.tr.dodged ? 'DODGED' : 'HIT', w / 2, h * 0.38);
-    c.shadowBlur = 0; c.textAlign = 'start';
+    const txt = k.tr.dodged ? 'DODGED' : 'HIT', col = k.tr.dodged ? '#7be0a0' : '#FF8FA3';
+    c.font = '800 46px system-ui, sans-serif'; c.textAlign = 'center';
+    const tw = c.measureText(txt).width + 44;
+    c.fillStyle = 'rgba(46,38,44,.94)'; c.strokeStyle = 'rgba(255,255,255,.22)'; c.lineWidth = 1.5; c.beginPath();
+    if (c.roundRect) c.roundRect(SCENE_W / 2 - tw / 2, 78, tw, 66, 14); else c.rect(SCENE_W / 2 - tw / 2, 78, tw, 66);
+    c.fill(); c.stroke(); c.fillStyle = col; c.fillText(txt, SCENE_W / 2, 127); c.textAlign = 'start';
   }
 }
 async function capture(name, mode, trial, t0, t1, fps, w, h) {
-  $('auto').checked = false;
+  state.auto = false;
+  document.body.classList.add('capturing'); brainFitted = false; sizeBrain();
+  bCam.position.multiplyScalar(0.78);
   setMode(mode); setTrial(trial);
   state.playing = true; state.speed = 1;
-  renderer.setPixelRatio(1); renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+  renderer.setPixelRatio(1); renderer.setSize(SCENE_W, h); camera.aspect = SCENE_W / h; camera.updateProjectionMatrix();
   const comp = document.createElement('canvas'); comp.width = w; comp.height = h;
   const c = comp.getContext('2d');
   const dt = 1 / fps; let now = 0;
@@ -362,23 +585,25 @@ async function capture(name, mode, trial, t0, t1, fps, w, h) {
   const n = Math.round((t1 - t0) * fps);
   for (let i = 0; i < n; i++) {
     update(dt, now); now += dt * 1000;
-    c.drawImage(renderer.domElement, 0, 0, w, h);
+    c.fillStyle = '#1E181C'; c.fillRect(0, 0, w, h);
+    c.drawImage(renderer.domElement, 0, 0, SCENE_W, h);
     drawOverlay(c, w, h, mode, trial);
     await fetch(`/frame?name=${name}&i=${i}`, { method: 'POST', body: comp.toDataURL('image/png') });
   }
   await fetch(`/done?name=${name}&fps=${fps}`, { method: 'POST' });
   document.title = 'capture done: ' + name;
 }
+
 const hp = new URLSearchParams(location.hash.slice(1));
 setMode(MODES[hp.get('mode')] ? hp.get('mode') : 'brain');
 if (hp.has('trial')) setTrial(+hp.get('trial'));
 if (hp.has('t')) state.t = +hp.get('t');
 if (hp.has('hide')) togglePanels(true);
 if (hp.has('pause')) { state.playing = false; $('play').textContent = 'Play'; }
-if (hp.has('speed')) { state.speed = +hp.get('speed'); $('speed').value = state.speed; $('speedv').textContent = state.speed + 'x'; }
+if (hp.has('speed')) setSpeed(+hp.get('speed'));
 if (hp.has('capture')) {
   const [name, mode, trial] = hp.get('capture').split(':');
-  capture(name, mode, +trial, 0.8, 4.4, 20, 640, 360);
+  capture(name, mode, +trial, 1.4, 4.6, 20, 800, 450);
 } else requestAnimationFrame(tick);
 </script>
 </body>

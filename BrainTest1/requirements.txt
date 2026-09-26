@@ -3,3 +3,4 @@ pyarrow
 neuprint-python
 networkx
 matplotlib
+scipy
