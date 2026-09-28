@@ -2,28 +2,58 @@
   <img src="assets/readme/banner.svg" alt="Echo-Fly: made by Nikolay Rangelov, Kiril Borisov, Ivan Damiankin and Mitko Totev, UKTC" width="100%">
 </p>
 
+<a name="team"></a>
+<img src="assets/readme/h-team.svg" alt="The Team" height="56">
+
+<p align="center">
+  <a href="https://github.com/Izu83"><img src="assets/readme/team-izu83.svg" alt="Nikolay Rangelov (@Izu83)" height="150"></a>
+  &nbsp;&nbsp;
+  <a href="https://github.com/KikarrA"><img src="assets/readme/team-kikarra.svg" alt="Kiril Borisov (@KikarrA)" height="150"></a>
+  &nbsp;&nbsp;
+  <a href="https://github.com/IvanDD916"><img src="assets/readme/team-ivandd916.svg" alt="Ivan Damiankin (@IvanDD916)" height="150"></a>
+  &nbsp;&nbsp;
+  <a href="https://github.com/miti0o0"><img src="assets/readme/team-miti0o0.svg" alt="Mitko Totev (@miti0o0)" height="150"></a>
+</p>
+
+<p align="center">
+  <a href="https://uktc-bg.com"><img src="assets/readme/school-uktc.svg" alt="UKTC, uktc-bg.com" height="100"></a><br>
+  <sub>11th grade project · The Vocational High School of Computer Technologies and Systems, Pravets, Bulgaria</sub>
+</p>
+
 <p align="center">
   <b>We took a piece of a real fruit fly's brain map, simulated it on a computer and let it drive a virtual fly.</b><br>
   Can it dodge walls? Find its way? Learn? And one day: can it use sonar, like a bat?
 </p>
 
 <p align="center">
-  <a href="#what-is-this">What is this?</a> ·
-  <a href="#what-weve-built">What we've built</a> ·
-  <a href="#how-the-fly-brain-drives-the-fly">How it works</a> ·
-  <a href="#try-it-yourself">Try it yourself</a> ·
-  <a href="#where-were-going">Where we're going</a> ·
-  <a href="#the-team">Team</a>
+  <img src="assets/readme/badge-python.svg" alt="Python" height="44">
+  <img src="assets/readme/badge-numpy.svg" alt="NumPy" height="44">
+  <img src="assets/readme/badge-javascript.svg" alt="JavaScript" height="44">
+  <img src="assets/readme/badge-matplotlib.svg" alt="Matplotlib" height="44">
+  <img src="assets/readme/badge-connectome.svg" alt="Male CNS connectome" height="44">
 </p>
+
+<p align="center">
+  <a href="#what-is-this"><img src="assets/readme/btn-what-is-this.svg" alt="What is this" height="40"></a>
+  <a href="#what-weve-built"><img src="assets/readme/btn-what-weve-built.svg" alt="What we've built" height="40"></a>
+  <a href="#how-it-works"><img src="assets/readme/btn-how-it-works.svg" alt="How it works" height="40"></a>
+  <a href="#try-it"><img src="assets/readme/btn-try-it.svg" alt="Try it" height="40"></a>
+  <a href="#where-were-going"><img src="assets/readme/btn-where-were-going.svg" alt="Plans" height="40"></a>
+  <a href="#limitations"><img src="assets/readme/btn-limitations.svg" alt="Limitations" height="40"></a>
+  <a href="#thanks"><img src="assets/readme/btn-thanks.svg" alt="Thanks" height="40"></a>
+</p>
+
+<br>
 
 <p align="center">
   <img src="experiments/carry-walk-sim/output/gifs/before_after_learning.gif" alt="The same simulated fly brain before learning, wandering and running out of time, and after 10 practice attempts, walking through the door straight to B" width="100%">
 </p>
 <p align="center"><sub>The same fly brain, before learning (left) and after 10 practice attempts (right). It has to walk from A to B, through the gap in the wall.</sub></p>
 
-## What is this?
+<a name="what-is-this"></a>
+<img src="assets/readme/h-what-is-this.svg" alt="What Is This?" height="56">
 
-**Echo-Fly** is an 11th grade project by four students from **UKTC** in Pravets, Bulgaria.
+**Echo-Fly** is an 11th grade project by the four of us at **UKTC** in Pravets, Bulgaria.
 
 Scientists have mapped **every neuron and every connection** in the brain and nerve cord of a fruit fly. That map
 is called a *connectome*. We cut a small piece out of it (820 neurons), simulate those neurons on a computer and
@@ -37,9 +67,10 @@ steers with its eyes, which is the step before.
 > Everything here runs on a computer: no real flies, no hardware. The brain model is simplified and the results
 > rest on assumptions we state below, so read them as *"promising"*, not *"proven"*.
 
-## What we've built
+<a name="what-weve-built"></a>
+<img src="assets/readme/h-what-weve-built.svg" alt="What We've Built" height="56">
 
-### 1. Is the wiring even there?
+<p align="center"><img src="assets/readme/exp-01.svg" alt="Experiment 01: Is the wiring even there?" width="100%"></p>
 
 Before simulating anything, we checked the map. Can a signal from the fly's **eyes** (the *looming* neurons that
 react when something rushes at the fly) or its **ears** (the hearing neurons in the antenna, *Johnston's organ*)
@@ -53,7 +84,7 @@ reach the neurons that make a fly **turn, walk or back up**?
 those short paths than the ears (right), which is why we started with the eyes.
 [More in the wiring check →](experiments/connectivity-check/)
 
-### 2. Dodge the wall
+<p align="center"><img src="assets/readme/exp-02.svg" alt="Experiment 02: Dodge the wall" width="100%"></p>
 
 The fly stays in place and walls fly at it. Each wall is open on the left or the right, and the fly has to move to
 the open side. On the right of each clip you see the 820 neurons, drawn where they sit in the brain and flashing
@@ -75,7 +106,7 @@ when they fire.
 
 [More in wall-dodge →](experiments/wall-dodge/) · the 3D replay, [`wall_dodge_3d.html`](experiments/wall-dodge/output/web/wall_dodge_3d.html), works offline in a browser.
 
-### 3. Walk, fetch and learn
+<p align="center"><img src="assets/readme/exp-03.svg" alt="Experiment 03: Walk, fetch and learn" width="100%"></p>
 
 Next we gave the same brain a whole world to walk around in: a 2D map **you paint yourself**. There are two
 separate tasks:
@@ -105,7 +136,8 @@ A fly that can't learn made it in 39.
 [More in carry-walk-sim →](experiments/carry-walk-sim/) · to try it, double-click `run.bat` in that folder. It runs
 in the browser, with nothing to install.
 
-## How the fly brain drives the fly
+<a name="how-it-works"></a>
+<img src="assets/readme/h-how-it-works.svg" alt="How It Works" height="56">
 
 ```mermaid
 flowchart LR
@@ -126,7 +158,8 @@ Each neuron is simulated 1,000 times per simulated second as a simple *leaky int
 its inputs, and when it's charged enough it fires and resets. The learning layer and the dopamine are our model of
 how real flies learn. They are not from the map.
 
-## Try it yourself
+<a name="try-it"></a>
+<img src="assets/readme/h-try-it.svg" alt="Try It Yourself" height="56">
 
 | What | How | Needs |
 |---|---|---|
@@ -162,7 +195,8 @@ Echo-Fly/
 
 </details>
 
-## Where we're going
+<a name="where-were-going"></a>
+<img src="assets/readme/h-where-were-going.svg" alt="Where We're Going" height="56">
 
 <p align="center">
   <img src="assets/readme/pipeline.svg" alt="The plan: virtual world, sonar ping, sensory neurons, fly connectome, motor neurons, then the fly moves and pings again" width="100%">
@@ -187,7 +221,8 @@ using only its sonar (and maybe a "smell" of fresh air from the exit).
 - [ ] *(Maybe)* Building escape
 - [ ] Poster and video
 
-## Honest limitations
+<a name="limitations"></a>
+<img src="assets/readme/h-limitations.svg" alt="Honest Limitations" height="56">
 
 - **This is not a fly that echolocates, yet.** The fly steers with its eyes, using a simple hand-made "looming"
   signal.
@@ -209,24 +244,8 @@ using only its sonar (and maybe a "smell" of fresh air from the exit).
 
 </details>
 
-## The team
-
-<p align="center">
-  <a href="https://github.com/Izu83"><img src="assets/readme/team-izu83.svg" alt="Nikolay Rangelov (@Izu83)" height="150"></a>
-  &nbsp;&nbsp;
-  <a href="https://github.com/KikarrA"><img src="assets/readme/team-kikarra.svg" alt="Kiril Borisov (@KikarrA)" height="150"></a>
-  &nbsp;&nbsp;
-  <a href="https://github.com/IvanDD916"><img src="assets/readme/team-ivandd916.svg" alt="Ivan Damiankin (@IvanDD916)" height="150"></a>
-  &nbsp;&nbsp;
-  <a href="https://github.com/miti0o0"><img src="assets/readme/team-miti0o0.svg" alt="Mitko Totev (@miti0o0)" height="150"></a>
-</p>
-
-<p align="center">
-  <a href="https://uktc-bg.com"><img src="assets/readme/school-uktc.svg" alt="UKTC, uktc-bg.com" height="100"></a><br>
-  <sub>The Vocational High School of Computer Technologies and Systems, Pravets, Bulgaria</sub>
-</p>
-
-## Thanks
+<a name="thanks"></a>
+<img src="assets/readme/h-thanks.svg" alt="Thanks" height="56">
 
 This project would be impossible without other people's work:
 
