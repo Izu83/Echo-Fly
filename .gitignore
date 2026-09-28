@@ -1,10 +1,10 @@
-tools/.cache/
 __pycache__/
-
-# BrainTest1: connectome data (~23 GB, download with BrainTest1/download_data.py) and local caches
-BrainTest1/data/
-BrainTest1/**/synapse_points_cache.feather
 *.pyc
+
+# connectome data (~24 GB, download with data/download_data.py) and local caches
+data/*.feather
+data/*.part
+experiments/**/synapse_points_cache.feather
 
 # lives on the raycast-v1 branch, not on main
 RayCastV1/

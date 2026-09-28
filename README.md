@@ -116,19 +116,19 @@ The fly brain might always pick the same side, or might do something we don't ex
 We cut a small circuit out of a real fly brain and put it in charge of steering a simulated fly. Walls fly at the fly, each with its left or right side open, and the fly has to move toward the open side. These are recorded runs replayed in 3D. On the left you see the wall and the fly; on the right, the 820 neurons of the circuit, drawn where they sit in the brain and flashing when they fire.
 
 <p align="center">
-  <img src="BrainTest1/wall-dodge/output/gifs/dodge_gap_left.gif" alt="The fly dodges a wall whose open side is on the left" width="49%">
-  <img src="BrainTest1/wall-dodge/output/gifs/dodge_gap_right.gif" alt="The fly dodges a wall whose open side is on the right" width="49%">
+  <img src="experiments/wall-dodge/output/gifs/dodge_gap_left.gif" alt="The fly dodges a wall whose open side is on the left" width="49%">
+  <img src="experiments/wall-dodge/output/gifs/dodge_gap_right.gif" alt="The fly dodges a wall whose open side is on the right" width="49%">
 </p>
 <p align="center"><sub><b>Real fly wiring</b>, open side on the left (first clip) and on the right (second clip). When the right eye sees more wall, the left steering neurons fire more and the fly moves left, and the other way round.</sub></p>
 
 <p align="center">
-  <img src="BrainTest1/wall-dodge/output/gifs/control_swapped_hit.gif" alt="Control: with the eyes swapped the fly steers the wrong way and hits the wall" width="49%">
-  <img src="BrainTest1/wall-dodge/output/graphs/accuracy_by_condition.png" alt="Walls dodged out of 100, by condition" width="49%">
+  <img src="experiments/wall-dodge/output/gifs/control_swapped_hit.gif" alt="Control: with the eyes swapped the fly steers the wrong way and hits the wall" width="49%">
+  <img src="experiments/wall-dodge/output/graphs/accuracy_by_condition.png" alt="Walls dodged out of 100, by condition" width="49%">
 </p>
 <p align="center"><sub><b>Control (left):</b> the same brain with the left and right eye swapped steers the wrong way and hits the wall. <b>Results (right):</b> walls dodged out of 100 random walls per condition. Real wiring 100, eyes swapped 0, eyes scrambled 1, a fly with no brain picking a side 50 (chance).</sub></p>
 
 > [!IMPORTANT]
-> **How much to trust this.** The dodge direction depends on an assumption we did not test: that a DNa neuron turns the fly toward its own side. With the opposite assumption the real-wiring and swapped-wire results would trade places. The task is also easy (a whole half of the wall is open), and one global synaptic gain was set so the small circuit works (it works from about 1.5 to 3, and breaks at 4). Details and the full list of caveats are in [`wall-dodge/README.md`](BrainTest1/wall-dodge/README.md).
+> **How much to trust this.** The dodge direction depends on an assumption we did not test: that a DNa neuron turns the fly toward its own side. With the opposite assumption the real-wiring and swapped-wire results would trade places. The task is also easy (a whole half of the wall is open), and one global synaptic gain was set so the small circuit works (it works from about 1.5 to 3, and breaks at 4). Details and the full list of caveats are in [`wall-dodge/README.md`](experiments/wall-dodge/README.md).
 
 **How it works**
 
@@ -136,25 +136,40 @@ We cut a small circuit out of a real fly brain and put it in charge of steering 
 2. That signal runs through 400 relay neurons to the four steering neurons (DNa01 and DNa02), using the real connections between them (about 54,000) and simple leaky integrate-and-fire neurons.
 3. If the right steering neurons fire more than the left ones, the fly moves right, and the other way round. Nothing else is scripted.
 
-The interactive version, [`wall_dodge_3d.html`](BrainTest1/wall-dodge/output/web/wall_dodge_3d.html), is a single file that works offline: download it and open it in a browser. It has a flapping 3D fly, the live brain view, four conditions to compare and 12 walls per condition to replay. Press **?** in it for an explanation.
+The interactive version, [`wall_dodge_3d.html`](experiments/wall-dodge/output/web/wall_dodge_3d.html), is a single file that works offline: download it and open it in a browser. It has a flapping 3D fly, the live brain view, four conditions to compare and 12 walls per condition to replay. Press **?** in it for an explanation.
 
-**The wiring check that came first** ([`BrainTest1/connectivity-check`](BrainTest1/connectivity-check/)). Before simulating anything, we checked that the candidate input neurons are wired to the candidate movement neurons at all, using the [male CNS connectome](https://male-cns.janelia.org/) (211,577 neurons, brain plus nerve cord). They are: the looming neurons and the hearing neurons (Johnston's organ) reach the turning, walking and backing-up neurons in **2 synapses or fewer**, and looming reaches the walking neuron **DNp09** directly. That folder has the charts and a plain-language write-up.
+**The wiring check that came first** ([`experiments/connectivity-check`](experiments/connectivity-check/)). Before simulating anything, we checked that the candidate input neurons are wired to the candidate movement neurons at all, using the [male CNS connectome](https://male-cns.janelia.org/) (211,577 neurons, brain plus nerve cord). They are: the looming neurons and the hearing neurons (Johnston's organ) reach the turning, walking and backing-up neurons in **2 synapses or fewer**, and looming reaches the walking neuron **DNp09** directly. That folder has the charts and a plain-language write-up.
+
+**A map you paint** ([`experiments/carry-walk-sim`](experiments/carry-walk-sim/)). The same 820-neuron circuit walks a fly around a 2D map that you draw yourself. It has two separate tasks: walking from A to B, and fetching a load and carrying it to a drop-off point. The fly learns which way to turn through dopamine: reward neurons (PAM) fire when things go better than expected, and punishment neurons (PPL1) fire when it bumps into a wall. It runs in the browser with nothing to install: double-click `run.bat` in that folder.
 
 The sonar side lives on its own branch: the first-person laser-sonar prototype *Echo Room* is on [`raycast-v1`](https://github.com/Izu83/Echo-Fly/tree/raycast-v1/RayCastV1). It is not connected to the fly brain yet.
 
 ### Run it yourself
 
-On Windows, double-click **`BrainTest1/run_game.bat`**. It runs every step one after another and opens the 3D page at the end:
+On Windows, double-click **`experiments/wall-dodge/run.bat`**. It runs every step one after another and opens the 3D page at the end:
 
 1. installs the Python packages (`requirements.txt`),
-2. downloads the connectome tables it needs, about 1.9 GB from Janelia (the full data is 23 GB, so it is not in this repository),
+2. downloads the connectome tables it needs into `data/`, about 1.9 GB from Janelia (the full data is 24 GB, so it is not in this repository),
 3. cuts the sub-circuit out of the connectome,
 4. runs the simulation (about 3 minutes),
 5. works out where each neuron sits, for the brain view,
-6. makes the charts,
-7. builds and opens the 3D page.
+6. builds and opens the 3D page.
 
-Steps that are already done are skipped, so a second run takes a few seconds. `run_game.bat force` (from a terminal) redoes the simulation. More detail is in [`BrainTest1/README.md`](BrainTest1/README.md).
+Steps that are already done are skipped, so a second run takes a few seconds. `run.bat force` (from a terminal) redoes the simulation. The map simulation needs none of this: double-click **`experiments/carry-walk-sim/run.bat`**. More detail is in [`experiments/README.md`](experiments/README.md).
+
+**Project layout**
+
+```
+Echo-Fly/
+  README.md               this page
+  requirements.txt        Python packages
+  data/                   the connectome (downloaded, not in git) + download_data.py, explore.py
+  experiments/
+    connectivity-check/   is the wiring there at all?
+    wall-dodge/           the first demo: dodge walls, 3D replay
+    carry-walk-sim/       paint a map, walk A to B or carry a load, learn with dopamine
+  assets/readme/          images used on this page
+```
 
 <a name="test-2"></a>
 <img src="assets/readme/h-test-2.svg" alt="Test 2: Building Escape" height="56">
@@ -219,5 +234,3 @@ This project would be impossible without other people's work:
 - **UKTC** and our teachers.
 
 <br>
-
-<p align="center"><sub>README graphics are generated by <code>tools/build_readme_assets.py</code>. Edit it and re-run to change them.</sub></p>

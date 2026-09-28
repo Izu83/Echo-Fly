@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carry-Walk Sim</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="brand">
+    <strong>Carry-Walk Sim</strong>
+    <span class="sub">a fly brain from the male CNS connectome, walking a map you paint</span>
+  </div>
+  <nav id="tabs" role="tablist"></nav>
+</header>
+
+<main>
+  <section class="stage">
+    <div class="toolbar" id="toolbar">
+      <div class="group" id="tools"></div>
+      <div class="group">
+        <label class="inline">Brush
+          <input type="range" id="brush" min="1" max="5" value="1">
+          <span id="brushVal">1</span>
+        </label>
+      </div>
+      <div class="group">
+        <button id="undo" title="Undo (Ctrl+Z)">Undo</button>
+        <button id="clear" title="Remove every wall">Clear</button>
+        <button id="border" title="Wall around the edge">Border</button>
+      </div>
+    </div>
+    <div class="canvasWrap" id="mapWrap">
+      <canvas id="map"></canvas>
+      <div class="banner" id="banner" hidden></div>
+    </div>
+    <div class="toolbar">
+      <div class="group">
+        <select id="preset" title="Ready-made maps"></select>
+        <button id="loadPreset">Load</button>
+      </div>
+      <div class="group">
+        <select id="newSize" title="Size of a new empty map">
+          <option value="48x30">48 × 30</option>
+          <option value="64x40" selected>64 × 40</option>
+          <option value="96x60">96 × 60</option>
+        </select>
+        <button id="newMap">New empty map</button>
+      </div>
+      <div class="group">
+        <button id="saveMap">Save map</button>
+        <label class="button">Open map<input type="file" id="openMap" accept=".json,application/json" hidden></label>
+      </div>
+    </div>
+    <p class="hint" id="hint"></p>
+  </section>
+
+  <aside>
+    <section class="panel">
+      <div class="runRow">
+        <button id="play" class="primary">Run</button>
+        <button id="step" title="One 20 ms step">Step</button>
+        <button id="reset">Reset</button>
+        <label class="inline">Speed
+          <select id="speed">
+            <option value="0.25">¼×</option>
+            <option value="0.5">½×</option>
+            <option value="1" selected>1×</option>
+            <option value="2">2×</option>
+            <option value="5">5×</option>
+            <option value="10">10×</option>
+            <option value="25">25×</option>
+            <option value="50">50×</option>
+            <option value="100">100×</option>
+          </select>
+        </label>
+      </div>
+      <dl class="stats">
+        <div><dt>Status</dt><dd id="stStatus">ready</dd></div>
+        <div><dt>Doing</dt><dd id="stPhase">-</dd></div>
+        <div><dt>Time</dt><dd id="stTime">0.0 s</dd></div>
+        <div><dt>Walked</dt><dd id="stDist">0.0 cells</dd></div>
+        <div><dt>Bumps</dt><dd id="stBumps">0</dd></div>
+      </dl>
+      <ol class="events" id="events"></ol>
+    </section>
+
+    <section class="panel" id="learnPanel">
+      <h2>Finding the target</h2>
+      <div class="seg" id="steering" role="radiogroup">
+        <button data-v="learned" title="The fly learns from dopamine which way to turn">Dopamine learning</button>
+        <button data-v="compass" title="A fixed compass pulls toward the target">Fixed compass</button>
+        <button data-v="none" title="Only the connectome's wall avoidance">None</button>
+      </div>
+      <div id="learnBox">
+        <div class="runRow">
+          <button id="train" class="primary">Train</button>
+          <select id="trainN" title="How many attempts to train">
+            <option value="10" selected>10 attempts</option>
+            <option value="50">50 attempts</option>
+            <option value="100">100 attempts</option>
+            <option value="250">250 attempts</option>
+            <option value="500">500 attempts</option>
+            <option value="1000">1000 attempts</option>
+          </select>
+          <button id="forget" title="Wipe what the fly has learned">Forget</button>
+        </div>
+        <p class="small muted" id="trainInfo"></p>
+        <div class="dopa">
+          <span class="name">PAM <small>reward</small></span><div class="bar pam"><i></i></div>
+          <span class="name">PPL1 <small>punishment</small></span><div class="bar ppl1"><i></i></div>
+        </div>
+        <canvas id="curve"></canvas>
+        <div class="legend small">
+          <span><i class="dot ok"></i>made it</span>
+          <span><i class="dot bad"></i>failed</span>
+          <span><i class="line rate"></i>success rate</span>
+          <span class="muted">bar height = time taken</span>
+        </div>
+        <details class="synapses">
+          <summary>What it has learned <span class="muted">(plastic synapses)</span></summary>
+          <div id="synapses"></div>
+        </details>
+        <div class="runRow">
+          <button id="saveMem">Save memory</button>
+          <label class="button">Open memory<input type="file" id="openMem" accept=".json,application/json" hidden></label>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Brain <span class="muted">820 neurons, 54k connections</span></h2>
+      <canvas id="brain"></canvas>
+      <div class="legend">
+        <span><i class="dot eyeL"></i>LPLC, left eye</span>
+        <span><i class="dot eyeR"></i>LPLC, right eye</span>
+        <span><i class="dot relay"></i>relay</span>
+        <span><i class="dot dna"></i>DNa01/02 (turning)</span>
+      </div>
+      <div class="meters" id="meters"></div>
+      <canvas id="trace"></canvas>
+      <div class="legend small">
+        <span><i class="line dnaL"></i>left DNa</span>
+        <span><i class="line dnaR"></i>right DNa</span>
+        <span class="muted">last 6 s, Hz</span>
+      </div>
+    </section>
+
+    <details class="panel" id="settingsPanel">
+      <summary>Settings</summary>
+      <div id="settings"></div>
+      <button id="defaults">Back to defaults</button>
+    </details>
+
+    <details class="panel">
+      <summary>How it works</summary>
+      <div class="about">
+        <p>The fly walks forward at a steady pace. Only its <b>brain</b> decides where it turns.</p>
+        <p><b>Eyes.</b> Each eye looks from straight ahead to its side (the coloured rays). The more of an eye's
+          view a wall fills, and the closer it is, the harder that eye's looming neurons
+          (<b>LPLC1, LPLC2, LPLC4</b>) are driven, up to 150 spikes/s each.</p>
+        <p><b>Brain.</b> 416 LPLC neurons, 400 relay neurons and the 4 turning neurons <b>DNa01/DNa02</b>, joined by
+          their real connections from the male CNS connectome (Janelia FlyEM). Every neuron is a leaky
+          integrate-and-fire unit simulated every millisecond. Nothing about "turn away from walls" is written
+          in the code: that comes from the wiring.</p>
+        <p><b>Turning.</b> Turning speed = gain × (right DNa rate − left DNa rate).</p>
+        <p><b>Dopamine learning.</b> The fly senses which direction its current target is (8 direction cells)
+          and how close walls are (6 wall cells). Those cells reach the turning neurons through synapses that start
+          out random, so a new fly has no idea where to go. <b>PAM</b> dopamine neurons fire when things go better
+          than expected (getting closer to the target, a wall moving away, grabbing the load, arriving).
+          <b>PPL1</b> dopamine neurons fire when they go worse (bumping, a wall looming up, walking away). Synapses
+          that were just used get stronger after PAM and weaker after PPL1. What it learns stays between attempts.</p>
+        <p><b>Fixed compass (for comparison).</b> Instead of learning, a compass sends extra spikes to the turning
+          neuron on the side of the target.</p>
+        <p><b>Built-in wall avoidance.</b> Switch it off in Settings to disconnect the eyes from the connectome's
+          looming neurons: the fly then has to learn from punishment alone that walls are bad.</p>
+        <p><b>Controls.</b> Set <i>Eye wiring</i> to <i>swapped</i> to plug each eye into the wrong side of the
+          brain: the fly then steers into walls.</p>
+      </div>
+    </details>
+  </aside>
+</main>
+
+<script src="brain_data.js"></script>
+<script src="brain.js"></script>
+<script src="sim.js"></script>
+<script src="presets.js"></script>
+<script src="learning.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
