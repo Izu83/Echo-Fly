@@ -2,162 +2,153 @@
   <img src="assets/readme/banner.svg" alt="Echo-Fly: made by Nikolay Rangelov, Kiril Borisov, Ivan Damiankin and Mitko Totev, UKTC" width="100%">
 </p>
 
-> [!WARNING]
-> **Echo-Fly is still early, and everything here comes with caveats.** So far we have a check of the fly connectome's wiring, a first spiking wall-dodge simulation driven by a simple *looming* input, and a browser sonar prototype (on the [`raycast-v1` branch](https://github.com/Izu83/Echo-Fly/tree/raycast-v1/RayCastV1)). We do **not** have the sonar wired into the fly brain yet. The results come from a small simulated circuit and rest on stated assumptions, so read them as *"promising"*, not *"proven"*.
-
 <p align="center">
-  <a href="https://uktc-bg.com"><img src="assets/readme/school-uktc.svg" alt="UKTC, uktc-bg.com" height="120"></a>
+  <b>We took a piece of a real fruit fly's brain map, simulated it on a computer and let it drive a virtual fly.</b><br>
+  Can it dodge walls? Find its way? Learn? And one day: can it use sonar, like a bat?
 </p>
 
 <p align="center">
-  <a href="https://github.com/Izu83"><img src="assets/readme/team-izu83.svg" alt="Nikolay Rangelov (@Izu83)" height="150"></a>
-  &nbsp;&nbsp;
-  <a href="https://github.com/KikarrA"><img src="assets/readme/team-kikarra.svg" alt="Kiril Borisov (@KikarrA)" height="150"></a>
-  &nbsp;&nbsp;
-  <a href="https://github.com/IvanDD916"><img src="assets/readme/team-ivandd916.svg" alt="Ivan Damiankin (@IvanDD916)" height="150"></a>
-  &nbsp;&nbsp;
-  <a href="https://github.com/miti0o0"><img src="assets/readme/team-miti0o0.svg" alt="Mitko Totev (@miti0o0)" height="150"></a>
+  <a href="#what-is-this">What is this?</a> ·
+  <a href="#what-weve-built">What we've built</a> ·
+  <a href="#how-the-fly-brain-drives-the-fly">How it works</a> ·
+  <a href="#try-it-yourself">Try it yourself</a> ·
+  <a href="#where-were-going">Where we're going</a> ·
+  <a href="#the-team">Team</a>
 </p>
 
 <p align="center">
-  <img src="assets/readme/badge-python.svg" alt="Python" height="44">
-  <img src="assets/readme/badge-brian2.svg" alt="Brian2" height="44">
-  <img src="assets/readme/badge-flywire.svg" alt="FlyWire" height="44">
-  <img src="assets/readme/badge-numpy.svg" alt="NumPy" height="44">
-  <img src="assets/readme/badge-matplotlib.svg" alt="Matplotlib" height="44">
+  <img src="experiments/carry-walk-sim/output/gifs/before_after_learning.gif" alt="The same simulated fly brain before learning, wandering and running out of time, and after 10 practice attempts, walking through the door straight to B" width="100%">
 </p>
-<p align="center"><sub>Python, NumPy and Matplotlib are in use. Brian2 is still planned: our simulator so far is a small NumPy model. The data is the male CNS connectome from Janelia FlyEM.</sub></p>
+<p align="center"><sub>The same fly brain, before learning (left) and after 10 practice attempts (right). It has to walk from A to B, through the gap in the wall.</sub></p>
 
-<br>
+## What is this?
 
-<img src="assets/readme/h-contents.svg" alt="Contents" height="56">
+**Echo-Fly** is an 11th grade project by four students from **UKTC** in Pravets, Bulgaria.
 
-<p align="center">
-  <a href="#about"><img src="assets/readme/btn-about.svg" alt="About" height="40"></a>
-  <a href="#the-idea"><img src="assets/readme/btn-the-idea.svg" alt="The Idea" height="40"></a>
-  <a href="#how-it-works"><img src="assets/readme/btn-how-it-works.svg" alt="How It Works" height="40"></a>
-  <a href="#first-demo"><img src="assets/readme/btn-first-demo.svg" alt="First Demo" height="40"></a>
-  <a href="#test-2"><img src="assets/readme/btn-test-2.svg" alt="Test 2" height="40"></a>
-  <a href="#roadmap"><img src="assets/readme/btn-roadmap.svg" alt="Roadmap" height="40"></a>
-  <a href="#limitations"><img src="assets/readme/btn-limitations.svg" alt="Limitations" height="40"></a>
-  <a href="#team"><img src="assets/readme/btn-team.svg" alt="Team" height="40"></a>
-  <a href="#thanks"><img src="assets/readme/btn-thanks.svg" alt="Thanks" height="40"></a>
-</p>
+Scientists have mapped **every neuron and every connection** in the brain and nerve cord of a fruit fly. That map
+is called a *connectome*. We cut a small piece out of it (820 neurons), simulate those neurons on a computer and
+connect them to a virtual fly. Nothing about "how to steer" is written in our code: the fly's own wiring decides.
 
-<br>
-
-<a name="about"></a>
-<img src="assets/readme/h-about.svg" alt="About" height="56">
-
-**Echo-Fly** is an 11th grade project by four students from **UKTC** (Pravets, Bulgaria).
-
-The short version: we want to build a **simulated echolocator** (a sonar, like a bat uses) and try to plug it into a **simulation of a real fruit fly brain**. Then we'll see if that brain can do anything useful with it, like dodging walls or finding a way out of a building.
-
-Everything happens on a computer: no hardware, no real flies. We don't know yet if it will work. Finding out is the point of the project.
-
-<a name="the-idea"></a>
-<img src="assets/readme/h-the-idea.svg" alt="The Idea" height="56">
-
-In 2024 the **FlyWire** project published a complete map of an adult fruit fly (*Drosophila*) brain: about **140,000 neurons** and **tens of millions of connections**. Google Research helped with the AI that traced the neurons. Scientists have since built simple computer models of that whole brain that can run on a normal laptop.
-
-But **fruit flies can't echolocate.** Nothing in their brain was built for sonar.
-
-So our question is roughly:
-
-> *If we feed sonar "echoes" into a real fly brain's wiring through senses it already has, does the brain respond in a way that makes sense, or is it just noise?*
-
-We honestly don't know the answer, and it could easily be "noise". That's still a result.
-
-<a name="how-it-works"></a>
-<img src="assets/readme/h-how-it-works.svg" alt="How It Might Work" height="56">
-
-<p align="center">
-  <img src="assets/readme/pipeline.svg" alt="Pipeline diagram" width="100%">
-</p>
-
-The plan (subject to change) is a loop:
-
-1. **Virtual world.** A simple 2D world with walls in it.
-2. **Sonar ping.** The fly sends out a few "beams" (left, front-left, front, front-right, right) and measures how far each one travels before it hits something. Closer wall = stronger echo.
-3. **Sensory neurons.** Echo strength becomes activity in fly sensory neurons. We're still choosing which ones. Current candidates are the **antenna / hearing** neurons (Johnston's organ) or the **"looming"** neurons that detect things rushing at the eyes.
-4. **Fly connectome.** Run the brain simulation for a short moment.
-5. **Motor neurons.** Read the neurons known to be involved in movement. The candidates so far are turning (e.g. **DNa01 / DNa02**), walking forward (**P9**) and backing up (**MDN**, the "moonwalker" neuron).
-6. **Move, then ping again.**
-
-<a name="first-demo"></a>
-<img src="assets/readme/h-first-demo.svg" alt="First Demo: Wall Dodge" height="56">
+Our big goal is to give the fly a sense it doesn't have: **sonar**, like a bat. Fruit flies can't echolocate, so
+the question is whether a real fly brain can make sense of it at all. We're not there yet. For now the fly
+steers with its eyes, which is the step before.
 
 > [!NOTE]
-> **First version built, with a stand-in input.** The wall-dodge simulation runs, but it is driven by a simple *looming* signal instead of sonar echoes. The sketch below is the original plan; the results in [What we've built so far](#what-weve-built-so-far) are from what we actually ran.
+> Everything here runs on a computer: no real flies, no hardware. The brain model is simplified and the results
+> rest on assumptions we state below, so read them as *"promising"*, not *"proven"*.
+
+## What we've built
+
+### 1. Is the wiring even there?
+
+Before simulating anything, we checked the map. Can a signal from the fly's **eyes** (the *looming* neurons that
+react when something rushes at the fly) or its **ears** (the hearing neurons in the antenna, *Johnston's organ*)
+reach the neurons that make a fly **turn, walk or back up**?
 
 <p align="center">
-  <img src="assets/readme/demo-wall-dodge.svg" alt="Wall dodge demo sketch" width="80%">
+  <img src="experiments/connectivity-check/output/graphs/hops_and_strength_heatmap.png" alt="Left: the number of synapses from each sense to each movement neuron, 1 or 2 everywhere. Right: how many connections those short paths carry, far more from the eyes than from the ears" width="90%">
 </p>
 
-**The quick version:** the fly **stays in place** and walls **fly at it**. Each wall has a **gap on the left or the right**. The fly can only do one thing: **dodge left or dodge right**.
+**Yes, and very directly.** Every one of them is only **1 or 2 synapses** away (left). The eyes have many more of
+those short paths than the ears (right), which is why we started with the eyes.
+[More in the wiring check →](experiments/connectivity-check/)
 
-- The side with the wall sends back **strong echoes**. The gap side sends back **weak ones**.
-- Those echoes go into the fly brain's left/right sensory neurons.
-- We compare the **left-turn vs right-turn** neurons. Whichever is more active is the dodge.
-- Dodged toward the gap = ✅ &nbsp; Otherwise = 💥
+### 2. Dodge the wall
 
-**What we'd hope to measure:**
-
-| Idea | Why |
-|---|---|
-| Accuracy over many walls | Random guessing gets ~50%. Anything clearly above that *might* mean the wiring is using the sonar. |
-| Swapped-wire control | Plug the left echo into the right side of the brain. If accuracy drops, that *could* show the wiring is what matters. |
-| Wall speed, gap size, sonar noise | Change one thing at a time and see what happens to accuracy. |
-
-The fly brain might always pick the same side, or might do something we don't expect at all. If that happens, we'll try other sensory neurons and compare.
-
-### What we've built so far
-
-We cut a small circuit out of a real fly brain and put it in charge of steering a simulated fly. Walls fly at the fly, each with its left or right side open, and the fly has to move toward the open side. These are recorded runs replayed in 3D. On the left you see the wall and the fly; on the right, the 820 neurons of the circuit, drawn where they sit in the brain and flashing when they fire.
+The fly stays in place and walls fly at it. Each wall is open on the left or the right, and the fly has to move to
+the open side. On the right of each clip you see the 820 neurons, drawn where they sit in the brain and flashing
+when they fire.
 
 <p align="center">
   <img src="experiments/wall-dodge/output/gifs/dodge_gap_left.gif" alt="The fly dodges a wall whose open side is on the left" width="49%">
   <img src="experiments/wall-dodge/output/gifs/dodge_gap_right.gif" alt="The fly dodges a wall whose open side is on the right" width="49%">
 </p>
-<p align="center"><sub><b>Real fly wiring</b>, open side on the left (first clip) and on the right (second clip). When the right eye sees more wall, the left steering neurons fire more and the fly moves left, and the other way round.</sub></p>
-
 <p align="center">
-  <img src="experiments/wall-dodge/output/gifs/control_swapped_hit.gif" alt="Control: with the eyes swapped the fly steers the wrong way and hits the wall" width="49%">
+  <img src="experiments/wall-dodge/output/gifs/control_swapped_hit.gif" alt="With the eyes swapped the fly steers the wrong way and hits the wall" width="49%">
   <img src="experiments/wall-dodge/output/graphs/accuracy_by_condition.png" alt="Walls dodged out of 100, by condition" width="49%">
 </p>
-<p align="center"><sub><b>Control (left):</b> the same brain with the left and right eye swapped steers the wrong way and hits the wall. <b>Results (right):</b> walls dodged out of 100 random walls per condition. Real wiring 100, eyes swapped 0, eyes scrambled 1, a fly with no brain picking a side 50 (chance).</sub></p>
 
-> [!IMPORTANT]
-> **How much to trust this.** The dodge direction depends on an assumption we did not test: that a DNa neuron turns the fly toward its own side. With the opposite assumption the real-wiring and swapped-wire results would trade places. The task is also easy (a whole half of the wall is open), and one global synaptic gain was set so the small circuit works (it works from about 1.5 to 3, and breaks at 4). Details and the full list of caveats are in [`wall-dodge/README.md`](experiments/wall-dodge/README.md).
+- **With its real wiring**, the fly dodged **100 of 100** walls.
+- **With the eyes plugged into the wrong side** of the brain, it dodged **0** (bottom left). So the wiring is what
+  does the steering.
+- A fly with no brain, picking a side at random, gets about 50.
 
-**How it works**
+[More in wall-dodge →](experiments/wall-dodge/) · the 3D replay, [`wall_dodge_3d.html`](experiments/wall-dodge/output/web/wall_dodge_3d.html), works offline in a browser.
 
-1. Each eye's *looming* neurons (LPLC, the ones that react to something growing in view) are driven harder the more wall that eye sees and the closer the wall is.
-2. That signal runs through 400 relay neurons to the four steering neurons (DNa01 and DNa02), using the real connections between them (about 54,000) and simple leaky integrate-and-fire neurons.
-3. If the right steering neurons fire more than the left ones, the fly moves right, and the other way round. Nothing else is scripted.
+### 3. Walk, fetch and learn
 
-The interactive version, [`wall_dodge_3d.html`](experiments/wall-dodge/output/web/wall_dodge_3d.html), is a single file that works offline: download it and open it in a browser. It has a flapping 3D fly, the live brain view, four conditions to compare and 12 walls per condition to replay. Press **?** in it for an explanation.
+Next we gave the same brain a whole world to walk around in: a 2D map **you paint yourself**. There are two
+separate tasks:
 
-**The wiring check that came first** ([`experiments/connectivity-check`](experiments/connectivity-check/)). Before simulating anything, we checked that the candidate input neurons are wired to the candidate movement neurons at all, using the [male CNS connectome](https://male-cns.janelia.org/) (211,577 neurons, brain plus nerve cord). They are: the looming neurons and the hearing neurons (Johnston's organ) reach the turning, walking and backing-up neurons in **2 synapses or fewer**, and looming reaches the walking neuron **DNp09** directly. That folder has the charts and a plain-language write-up.
+- **Walk A → B.** Walk from the start to the goal.
+- **Carry.** Walk to a load, pick it up and carry it to the drop-off point.
 
-**A map you paint** ([`experiments/carry-walk-sim`](experiments/carry-walk-sim/)). The same 820-neuron circuit walks a fly around a 2D map that you draw yourself. It has two separate tasks: walking from A to B, and fetching a load and carrying it to a drop-off point. The fly learns which way to turn through dopamine: reward neurons (PAM) fire when things go better than expected, and punishment neurons (PPL1) fire when it bumps into a wall. It runs in the browser with nothing to install: double-click `run.bat` in that folder.
+<p align="center">
+  <img src="experiments/carry-walk-sim/output/gifs/walk_a_to_b.gif" alt="The fly walks from A, through the gap in the wall, to B. A side panel shows its eye input, turning neurons and dopamine" width="49%">
+  <img src="experiments/carry-walk-sim/output/gifs/carry_the_load.gif" alt="The fly walks to the load between the shelves, picks it up and carries it to the drop-off point" width="49%">
+</p>
 
-The sonar side lives on its own branch: the first-person laser-sonar prototype *Echo Room* is on [`raycast-v1`](https://github.com/Izu83/Echo-Fly/tree/raycast-v1/RayCastV1). It is not connected to the fly brain yet.
+How it works, simply:
 
-### Run it yourself
+1. **The fly always walks forward.** The only thing its brain decides is which way to turn.
+2. **Its eyes** (the coloured lines) see the walls. The closer a wall, the harder the eye's looming neurons fire.
+3. **The brain** passes that on to the **turning neurons**. If the right ones fire more, the fly turns right.
+   That alone is enough to steer around walls.
+4. **To find the goal it has to learn**, using **dopamine**, the same "reward" chemical real brains use:
+   - things go **better than expected** (getting closer, grabbing the load, arriving) → **reward** neurons fire →
+     *"do that again"*;
+   - things go **worse** (bumping into a wall, walking away) → **punishment** neurons fire → *"don't do that"*.
 
-On Windows, double-click **`experiments/wall-dodge/run.bat`**. It runs every step one after another and opens the 3D page at the end:
+A new fly has no idea where to go. **After 10 practice attempts it made it in 90 of 90 test runs**, on every map.
+A fly that can't learn made it in 39.
 
-1. installs the Python packages (`requirements.txt`),
-2. downloads the connectome tables it needs into `data/`, about 1.9 GB from Janelia (the full data is 24 GB, so it is not in this repository),
-3. cuts the sub-circuit out of the connectome,
-4. runs the simulation (about 3 minutes),
-5. works out where each neuron sits, for the brain view,
-6. builds and opens the 3D page.
+[More in carry-walk-sim →](experiments/carry-walk-sim/) · to try it, double-click `run.bat` in that folder. It runs
+in the browser, with nothing to install.
 
-Steps that are already done are skipped, so a second run takes a few seconds. `run.bat force` (from a terminal) redoes the simulation. The map simulation needs none of this: double-click **`experiments/carry-walk-sim/run.bat`**. More detail is in [`experiments/README.md`](experiments/README.md).
+## How the fly brain drives the fly
 
-**Project layout**
+```mermaid
+flowchart LR
+    world["Map with walls"] --> eyes["Eyes<br/>how close are the walls?"]
+    eyes --> lplc["416 looming neurons<br/>(LPLC)"]
+    lplc --> relay["400 relay neurons"]
+    relay --> dna["4 turning neurons<br/>(DNa01 / DNa02)"]
+    dna --> move["The fly turns<br/>and walks on"]
+    move --> world
+    goal["Where is the goal?"] --> learned["Learned connections"]
+    learned --> dna
+    dopamine["Dopamine<br/>reward / punishment"] -. teaches .-> learned
+
+    classDef real fill:#1b4d4a,stroke:#3fc8c0,color:#ffffff
+    class lplc,relay,dna real
+```
+
+The three teal boxes are **real neurons from the connectome**, joined by their real connections (about 54,000).
+Each neuron is simulated 1,000 times per simulated second as a simple *leaky integrate-and-fire* unit: it adds up
+its inputs, and when it's charged enough it fires and resets. The learning layer and the dopamine are our model of
+how real flies learn. They are not from the map.
+
+## Try it yourself
+
+| What | How | Needs |
+|---|---|---|
+| **Walk, fetch and learn** | Double-click [`experiments/carry-walk-sim/run.bat`](experiments/carry-walk-sim/), or open `web/index.html` in that folder | Just a browser |
+| **Wall dodge, 3D replay** | Open [`wall_dodge_3d.html`](experiments/wall-dodge/output/web/wall_dodge_3d.html) | Just a browser |
+| **Wall dodge, run it again** | Double-click `experiments/wall-dodge/run.bat` | Python, and a 1.9 GB download it does for you |
+| **The wiring check** | `python experiments/connectivity-check/scripts/run_check.py` | Python and the data (below) |
+
+The connectome data is too big for the repository (24 GB in total), so it's downloaded from Janelia into `data/`:
+
+```bash
+pip install -r requirements.txt
+python data/download_data.py --core
+```
+
+`--core` gets the 1.9 GB that everything except the wiring check's 3D view needs.
+[More about the experiments and the data →](experiments/)
+
+<details>
+<summary><b>What's in this repository</b></summary>
 
 ```
 Echo-Fly/
@@ -171,66 +162,81 @@ Echo-Fly/
   assets/readme/          images used on this page
 ```
 
-<a name="test-2"></a>
-<img src="assets/readme/h-test-2.svg" alt="Test 2: Building Escape" height="56">
+</details>
 
-Only if the first demo goes somewhere. The fly is placed **blind inside a building (a maze)** and has to find its way out using only the echolocator.
+## Where we're going
 
-- Dodging walls alone probably won't find the exit, so the exit might give off a **"smell"** (fresh air) that gets stronger as the fly gets closer, feeding the fly's odor neurons.
-- We'd compare the connectome-driven fly against a **randomly moving fly** to see if the real brain wiring helps at all.
-- Stretch goal, *if* there's time: move from 2D to a 3D fly body using **NeuroMechFly / FlyGym**.
+<p align="center">
+  <img src="assets/readme/pipeline.svg" alt="The plan: virtual world, sonar ping, sensory neurons, fly connectome, motor neurons, then the fly moves and pings again" width="100%">
+</p>
 
-<a name="roadmap"></a>
-<img src="assets/readme/h-roadmap.svg" alt="Roadmap" height="56">
+The plan is to swap the eyes for **sonar**. The fly sends out a few "beams", measures how far each one travels
+before it hits a wall, and turns those echoes into activity in its sensory neurons. The hearing neurons are the
+natural candidate, and the wiring check shows they reach the turning neurons in 2 synapses too. A first sonar
+prototype, *Echo Room*, is on the [`raycast-v1`](https://github.com/Izu83/Echo-Fly/tree/raycast-v1/RayCastV1)
+branch. It isn't connected to the fly brain yet.
 
-- [x] Pick an idea we're excited about
-- [x] Plan the two tests
-- [x] Get the male fly connectome and check that input and movement neurons are wired together
-- [ ] Get an existing whole-brain fly model running and reproduce one of its published results *(we wrote our own small model instead, so this is still open)*
-- [x] Build the wall simulation *(with a looming input)*
-- [x] Connect it to the fly circuit for a single wall / single trial
-- [x] Run many trials + the swapped-wire control *(with a looming input)*
-- [x] Browser sonar prototype (Echo Room, on the [`raycast-v1` branch](https://github.com/Izu83/Echo-Fly/tree/raycast-v1/RayCastV1))
-- [ ] Replace the looming input with sonar echoes and wire it into the fly brain
-- [ ] Test the steering-direction assumption and stronger controls
+If that works, the next test is a **building escape**: the fly starts blind inside a maze and has to find the exit
+using only its sonar (and maybe a "smell" of fresh air from the exit).
+
+- [x] Get the fly connectome and check that the senses are wired to the movement neurons
+- [x] Wall dodge: a real piece of the brain steers the fly, with the swapped-wire control
+- [x] A map you paint: walk A to B and carry a load, learning with dopamine
+- [x] Browser sonar prototype (Echo Room, on the [`raycast-v1`](https://github.com/Izu83/Echo-Fly/tree/raycast-v1/RayCastV1) branch)
+- [ ] Replace the eyes with sonar echoes and wire them into the fly brain
+- [ ] Test the steering-direction assumption with stronger controls
+- [ ] Get an existing whole-brain fly model running and reproduce one of its published results
 - [ ] *(Maybe)* Building escape
-- [ ] Graphs, video, poster *(first graphs and a 3D replay exist)*
+- [ ] Poster and video
 
-<a name="limitations"></a>
-<img src="assets/readme/h-limitations.svg" alt="Limitations" height="56">
+## Honest limitations
 
-To be upfront about what this is and isn't:
+- **This is not a fly that echolocates, yet.** The fly steers with its eyes, using a simple hand-made "looming"
+  signal.
+- **It's a small piece of the brain.** 820 neurons out of about 200,000, each one a very simple model. Real neurons
+  are far more complicated.
+- **The steering direction is an assumption.** We assume a turning neuron turns the fly toward its own side. We
+  haven't tested it, and the results depend on it.
 
-- **This is not a fly that echolocates.** At best it's a real fly brain map *reacting* to a made-up sense.
-- **The brain model is very simplified.** Every neuron is a basic "leaky integrate-and-fire" unit, and our simulation uses only about 820 neurons cut out of the connectome, not the whole brain. Real neurons are much more complicated.
-- **The input is not sonar yet.** The wall-dodge results use a hand-made looming signal. Whether sonar echoes work the same way is the open question of the project.
-- **The steering direction is an assumption.** We assume a DNa neuron turns the fly toward its own side. We have not tested it, and the result depends on it.
-- **The connectome is only the brain.** It doesn't include the body or the rest of the nervous system the same way, so movement outputs are an approximation.
-- **Recorded, not real time.** Our small circuit is fast, but the full connectome would not be. Results are recorded and replayed in the 3D page.
+<details>
+<summary><b>More limitations</b></summary>
+
+- **The learning is our model.** The goal-direction cells, the learned connections and the dopamine rule are not
+  from the connectome. They are modelled on how the fly's learning centre (the mushroom body) is thought to work.
+- **Some numbers were tuned by hand**, such as how strong the eye input is and one overall connection strength,
+  so that the small circuit works.
+- **No body.** The fly is a dot that turns and walks. A real fly body (for example NeuroMechFly / FlyGym) is a
+  possible later step.
 - **We're students.** We're learning as we go, and some of what's written here may turn out to be wrong.
 
-<a name="team"></a>
-<img src="assets/readme/h-team.svg" alt="Team" height="56">
+</details>
 
-| Name | GitHub |
-|---|---|
-| **Nikolay Rangelov** | [@Izu83](https://github.com/Izu83) |
-| **Kiril Borisov** | [@KikarrA](https://github.com/KikarrA) |
-| **Ivan Damiankin** | [@IvanDD916](https://github.com/IvanDD916) |
-| **Mitko Totev** | [@miti0o0](https://github.com/miti0o0) |
+## The team
 
-From **UKTC**, the Vocational High School of Computer Technologies and Systems in Pravets, Bulgaria: [uktc-bg.com](https://uktc-bg.com)
+<p align="center">
+  <a href="https://github.com/Izu83"><img src="assets/readme/team-izu83.svg" alt="Nikolay Rangelov (@Izu83)" height="150"></a>
+  &nbsp;&nbsp;
+  <a href="https://github.com/KikarrA"><img src="assets/readme/team-kikarra.svg" alt="Kiril Borisov (@KikarrA)" height="150"></a>
+  &nbsp;&nbsp;
+  <a href="https://github.com/IvanDD916"><img src="assets/readme/team-ivandd916.svg" alt="Ivan Damiankin (@IvanDD916)" height="150"></a>
+  &nbsp;&nbsp;
+  <a href="https://github.com/miti0o0"><img src="assets/readme/team-miti0o0.svg" alt="Mitko Totev (@miti0o0)" height="150"></a>
+</p>
 
-<a name="thanks"></a>
-<img src="assets/readme/h-thanks.svg" alt="Thanks" height="56">
+<p align="center">
+  <a href="https://uktc-bg.com"><img src="assets/readme/school-uktc.svg" alt="UKTC, uktc-bg.com" height="100"></a><br>
+  <sub>The Vocational High School of Computer Technologies and Systems, Pravets, Bulgaria</sub>
+</p>
+
+## Thanks
 
 This project would be impossible without other people's work:
 
-- **FlyWire Consortium**, for the whole-brain fruit fly connectome ([flywire.ai](https://flywire.ai)). Dorkenwald et al., *"Neuronal wiring diagram of an adult brain"*, Nature (2024), and Schlegel et al., *"Whole-brain annotation and multi-connectome cell typing of Drosophila"*, Nature (2024).
-- **Google Research**, for the AI-based neuron reconstruction behind the map.
-- **Shiu et al.**, *"A Drosophila computational brain model reveals sensorimotor processing"*, Nature (2024), for showing a whole fly brain can be simulated on a laptop. Our neuron settings follow theirs (from memory, so approximately).
-- **Janelia FlyEM and the Male CNS connectome team**, for the male brain and nerve cord connectome we use ([male-cns.janelia.org](https://male-cns.janelia.org/), licensed CC-BY).
+- **Janelia FlyEM and the Male CNS connectome team**, for the male fly brain and nerve cord connectome we use
+  ([male-cns.janelia.org](https://male-cns.janelia.org/), licensed CC-BY).
+- **FlyWire Consortium**, for the first whole-brain fruit fly connectome ([flywire.ai](https://flywire.ai)), and
+  **Google Research** for the AI behind the neuron tracing. Dorkenwald et al. and Schlegel et al., Nature (2024).
+- **Shiu et al.**, *"A Drosophila computational brain model reveals sensorimotor processing"*, Nature (2024), for
+  showing a whole fly brain can be simulated on a laptop. Our neuron settings follow theirs (approximately).
 - **NeuroMechFly / FlyGym** (EPFL), for the simulated fly body we might use later.
 - **UKTC** and our teachers.
-
-<br>

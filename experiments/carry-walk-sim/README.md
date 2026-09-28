@@ -207,6 +207,7 @@ carry-walk-sim/
     charts.js             the charts on the page (success rate, time, bumps, what it learned, dopamine)
     style.css
   output/graphs/          charts of the results: learning over 300 attempts, naive vs trained
+  output/gifs/            short recordings of the fly walking, carrying, and before vs after learning
   scripts/
     export_brain.py       rebuilds web/brain_data.js from wall-dodge's subnetwork.npz
     batch_run.js          runs maps many times without the browser and prints success rates
