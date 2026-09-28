@@ -109,13 +109,11 @@ in the browser, with nothing to install.
 
 ```mermaid
 flowchart LR
-    world["Map with walls"] --> eyes["Eyes<br/>how close are the walls?"]
-    eyes --> lplc["416 looming neurons<br/>(LPLC)"]
-    lplc --> relay["400 relay neurons"]
+    eyes["Eyes<br/>how close are the walls?"] --> lplc["416 looming<br/>neurons (LPLC)"]
+    lplc --> relay["400 relay<br/>neurons"]
     relay --> dna["4 turning neurons<br/>(DNa01 / DNa02)"]
-    dna --> move["The fly turns<br/>and walks on"]
-    move --> world
-    goal["Where is the goal?"] --> learned["Learned connections"]
+    dna --> move["The fly turns,<br/>walks on and<br/>looks again"]
+    goal["Where is<br/>the goal?"] --> learned["Learned<br/>connections"]
     learned --> dna
     dopamine["Dopamine<br/>reward / punishment"] -. teaches .-> learned
 
