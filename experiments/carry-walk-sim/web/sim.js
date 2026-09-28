@@ -246,7 +246,7 @@
         this.status = "timeout";
         this.events.push({ t: this.t, what: "ran out of time" });
       }
-      if (this.status !== "running" && learning) this.learner.endEpisode(this);
+      if (this.status !== "running" && this.learner) this.learner.endEpisode(this);   // every attempt is recorded
     }
   }
 

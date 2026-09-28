@@ -16,8 +16,13 @@
   --goal: #5b9cf0;
   --pickup: #f39a3d;
   --drop: #b07cf0;
-  --ok: #58c472;
-  --bad: #ef6464;
+  --ok: #0ca30c;
+  --bad: #d03b3b;
+  --s1: #3987e5;
+  --s2: #d95926;
+  --s3: #199e70;
+  --s4: #c98500;
+  --grid-line: #232a35;
 }
 
 * { box-sizing: border-box; }
@@ -118,8 +123,8 @@ p.small { margin: 6px 0; }
 .dopa .name { color: var(--muted); }
 .dopa small { font-size: 10px; opacity: .8; }
 .bar.pam i, .bar.ppl1 i { left: 0; transition: width .08s linear; }
-.bar.pam i { background: var(--ok); }
-.bar.ppl1 i { background: var(--bad); }
+.bar.pam i { background: var(--s1); }
+.bar.ppl1 i { background: var(--s2); }
 #curve { width: 100%; height: 110px; display: block; background: var(--floor); border-radius: 6px; }
 .dot.ok { background: var(--ok); } .dot.bad { background: var(--bad); }
 .synapses { margin: 8px 0; font-size: 12px; }
@@ -130,3 +135,24 @@ p.small { margin: 6px 0; }
 .syn .n { color: #c5ccd8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #learnBox[hidden] { display: none; }
 .line.rate { background: #e6e9ef; }
+
+.charts { margin-top: 4px; }
+.chartsHead { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin-bottom: 10px; }
+.chartsHead h2 { margin: 0; flex: 1; min-width: 160px; }
+.chartGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+.chart { margin: 0; background: var(--floor); border: 1px solid var(--line); border-radius: 8px; padding: 10px 10px 8px; min-width: 0; }
+.chart.wide { grid-column: 1 / -1; }
+.chart figcaption { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.chart figcaption span { display: block; font-weight: normal; color: var(--muted); font-size: 11px; }
+.plot { position: relative; }
+.plot canvas { display: block; width: 100%; height: 150px; }
+.chart.wide .plot canvas { height: 120px; }
+.tip {
+  position: absolute; pointer-events: none; background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px;
+  padding: 6px 8px; font-size: 12px; white-space: nowrap; box-shadow: 0 4px 14px rgba(0,0,0,.4); z-index: 2;
+}
+.tip div { display: flex; align-items: center; gap: 6px; }
+.tip i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.tip span { margin-left: auto; padding-left: 12px; font-variant-numeric: tabular-nums; }
+.line.s1 { background: var(--s1); } .line.s2 { background: var(--s2); }
+.line.s3 { background: var(--s3); } .line.s4 { background: var(--s4); }

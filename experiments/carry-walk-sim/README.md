@@ -135,24 +135,27 @@ random direction each time. The last column trained 20 attempts **without the bu
 
 | Map | Naive (can't learn) | Trained 10 attempts | Trained 20, no built-in wall avoidance |
 |---|---|---|---|
-| Walk: Open room | 10/10 (46 s) | 10/10 (19 s) | 10/10 (20 s) |
-| Walk: Pillars | 10/10 (60 s) | 10/10 (40 s) | 8/10 (71 s, 13 bumps) |
-| Walk: Wall in the way | 6/10 (71 s) | 10/10 (20 s) | 10/10 (21 s) |
-| Walk: Two rooms | 0/10 | 10/10 (25 s) | 9/10 (51 s) |
-| Walk: Zigzag | 10/10 (72 s) | 10/10 (69 s) | 2/10 |
-| Carry: Open floor | 0/10 | 10/10 (33 s) | 10/10 (33 s) |
-| Carry: Warehouse | 0/10 | 10/10 (50 s) | 7/10 (102 s, 29 bumps) |
-| Carry: Fetch from next room | 0/10 | 10/10 (62 s) | 7/10 (79 s) |
-| Carry: Pillar field | 3/10 (100 s) | 10/10 (57 s) | 9/10 (60 s) |
-| **Total** | **39/90** | **90/90** | **72/90** |
+| Walk: Open room | 10/10 (46 s) | 10/10 (20 s) | 10/10 (19 s) |
+| Walk: Pillars | 10/10 (60 s) | 10/10 (20 s) | 10/10 (21 s, 1.8 bumps) |
+| Walk: Wall in the way | 6/10 (71 s) | 10/10 (19 s) | 10/10 (21 s) |
+| Walk: Two rooms | 0/10 | 10/10 (31 s) | 7/10 (30 s, 4.9 bumps) |
+| Walk: Zigzag | 10/10 (72 s) | 10/10 (54 s) | 1/10 |
+| Carry: Open floor | 0/10 | 10/10 (34 s) | 10/10 (34 s) |
+| Carry: Warehouse | 0/10 | 10/10 (41 s) | 10/10 (55 s, 7.8 bumps) |
+| Carry: Fetch from next room | 0/10 | 10/10 (53 s) | 2/10 |
+| Carry: Pillar field | 3/10 (100 s) | 10/10 (49 s) | 6/10 (54 s) |
+| **Total** | **39/90** | **90/90** | **66/90** |
 
-- **Learning works.** After 10 practice attempts the fly makes it every time, on every map. On *Wall in the way*
-  it takes 20 s, where the fixed compass takes 39 s.
+- **Learning works.** After 10 practice attempts the fly makes it every time, on every map, with about one bump
+  or fewer per run. It is faster than the fixed compass on *Wall in the way* (19 s vs 39 s), *Zigzag* (54 s vs
+  72 s) and *Fetch from next room* (53 s vs 101 s).
 - **The naive fly** only makes it when its random start happens to point roughly the right way, or when it
-  bumbles into the target. It never manages the carry tasks, which need two targets.
+  bumbles into the target. It almost never manages the carry tasks, which need two targets.
 - **Walls learned from scratch.** Without the built-in wall avoidance, the fly learns to avoid walls from
-  punishment alone and succeeds 72/90. It bumps much more, and the zigzag, where it has to walk away from the
-  target to get around a wall, is mostly too hard.
+  punishment alone and succeeds 66/90. It bumps much more. Maps where it has to walk away from the target to get
+  around a wall (*Zigzag*, *Fetch from next room*) are mostly too hard.
+- **Long training stays stable.** One fly per map trained for 300 attempts kept succeeding throughout (Zigzag
+  and Fetch from next room dipped to 90–95% for a few attempts). The graphs are in [`output/graphs/`](output/graphs/).
 
 **Fixed compass and checks.** `node scripts/batch_run.js --steering compass` runs every ready-made map 10
 times (seeds 1 to 10). The two checks change one thing each: **swapped** wires each eye into the wrong side
@@ -201,7 +204,9 @@ carry-walk-sim/
     presets.js            ready-made maps
     learning.js           dopamine learning: sense cells, plastic synapses, PAM / PPL1, the learning rule
     brain_data.js         the 820-neuron circuit from the connectome (generated, see below)
+    charts.js             the charts on the page (success rate, time, bumps, what it learned, dopamine)
     style.css
+  output/graphs/          charts of the results: learning over 300 attempts, naive vs trained
   scripts/
     export_brain.py       rebuilds web/brain_data.js from wall-dodge's subnetwork.npz
     batch_run.js          runs maps many times without the browser and prints success rates

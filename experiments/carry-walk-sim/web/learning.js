@@ -120,8 +120,11 @@
       }
     }
 
+    // one record per attempt; `pref` = right minus left synapse (Hz) for target-right, target-left,
+    // wall-left-front and wall-right-front, so the charts can show how the learning changed over time
     endEpisode(run) {
-      this.episodes.push({ ok: run.status === "success", t: +run.t.toFixed(2), bumps: run.bumps, carried: !!run.carrying });
+      const w = this.w, pref = [2, 6, N_DIR, N_DIR + 3].map((k) => Math.round(w[k * 2 + 1] - w[k * 2]));
+      this.episodes.push({ ok: run.status === "success", t: +run.t.toFixed(2), bumps: run.bumps, carried: !!run.carrying, mode: run.s.steering, pref });
       if (this.episodes.length > 5000) this.episodes.shift();
     }
 

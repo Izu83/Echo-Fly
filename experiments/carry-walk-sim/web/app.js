@@ -58,8 +58,10 @@
   function newRun(I) {
     I.run = new CWS.Run(I.map, BRAIN_DATA, I.settings, I.learner);
     I.trace = [];
+    I.dopaTrace = [];
     I.flash = new Float32Array(BRAIN_DATA.n);
     I.acc = 0;
+    if (!I.visits || I.visits.length !== I.map.w * I.map.h) I.visits = new Float32Array(I.map.w * I.map.h);
   }
   function saveMap(I) { store.set("map:" + I.task, CWS.mapToJSON(I.map)); }
   function saveSettings(I) { store.set("settings:" + I.task, I.settings); }
@@ -202,13 +204,18 @@
     for (let i = 0; i < c.length; i++) if (c[i]) I.flash[i] = 1;
     I.trace.push([r.dnaL, r.dnaR]);
     if (I.trace.length > 300) I.trace.shift();
+    I.dopaTrace.push([r.t, r.pam, r.ppl1]);
+    const cx = Math.floor(r.x), cy = Math.floor(r.y);
+    if (cx >= 0 && cy >= 0 && cx < I.map.w && cy < I.map.h) I.visits[cy * I.map.w + cx]++;
     if (r.status !== "running") {
-      if (r.s.steering === "learned") { saveMemory(I); I.curveDirty = true; }
+      saveMemory(I);
+      I.curveDirty = true;
       const T = I.training;
       if (T && T.done + 1 < T.total) {
         T.done++;
         r.reset(!!I.settings.randomStart);
         I.trace = [];
+        I.dopaTrace = [];
       } else {
         if (T) T.done = T.total;
         I.training = null;
@@ -249,6 +256,7 @@
     if (!confirm("Wipe everything this fly has learned?")) return;
     cur.training = null; cur.playing = false;
     cur.learner.forget(cur.settings.seed);
+    cur.visits = null;
     saveMemory(cur);
     newRun(cur); buildLearn(); updateButtons();
   };
@@ -352,6 +360,7 @@
     // the run keeps a reference to the map, so copy into the same object
     Object.keys(I.map).forEach((k) => delete I.map[k]);
     Object.assign(I.map, m);
+    I.visits = null;
     saveMap(I);
     I.playing = false;
     newRun(I);
@@ -477,7 +486,7 @@
       c.height = Math.round(c.clientHeight * dpr);
     }
   }
-  window.addEventListener("resize", resize);
+  window.addEventListener("resize", () => { resize(); cur.curveDirty = true; });
 
   function drawMarker(p, color, label, ring) {
     ctx.save();
@@ -513,6 +522,21 @@
     ctx.restore();
   }
 
+  // where the fly has walked, over all attempts on this map: one blue, light (rarely) to strong (often)
+  function drawHeat(I) {
+    const m = I.map, v = I.visits;
+    let max = 0;
+    for (let i = 0; i < v.length; i++) if (v[i] > max) max = v[i];
+    if (!max) return;
+    for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) {
+      const n = v[y * m.w + x];
+      if (!n) continue;
+      const a = Math.log1p(n) / Math.log1p(max);
+      ctx.fillStyle = `rgba(57,135,229,${(0.12 + 0.7 * a).toFixed(3)})`;
+      ctx.fillRect(x, y, 1, 1);
+    }
+  }
+
   function drawMap() {
     const I = cur, m = I.map, r = I.run;
     ctx.fillStyle = css("--floor");
@@ -524,6 +548,7 @@
       for (let y = 1; y < m.h; y++) { ctx.moveTo(0, y); ctx.lineTo(m.w, y); }
       ctx.stroke();
     }
+    if (view.showHeat && I.visits) drawHeat(I);
     ctx.fillStyle = css("--wall");
     for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) if (m.grid[y * m.w + x]) ctx.fillRect(x, y, 1.02, 1.02);
 
@@ -700,8 +725,65 @@
     } else banner.hidden = true;
   }
 
+  // ---------- charts ----------
+  const { LineChart, rolling, mean, median } = CWS_CHARTS;
+  const plot = (id, opts) => new LineChart($(id), $(id).nextElementSibling, { xName: "Attempt", empty: "No attempts yet: press Train or Run", ...opts });
+  const charts = {
+    success: plot("cSuccess", { yMin: 0, yMax: 100, yFmt: (v) => `${Math.round(v)}%` }),
+    time: plot("cTime", { yMin: 0, yFmt: (v) => `${Math.round(v)} s` }),
+    bumps: plot("cBumps", { yMin: 0, yFmt: (v) => (v < 10 ? v.toFixed(1) : String(Math.round(v))) }),
+    learned: plot("cLearned", { yMin: -200, yMax: 200, zero: true, yFmt: (v) => String(Math.round(v)) }),
+    dopa: new LineChart($("cDopa"), $("cDopa").nextElementSibling, {
+      xName: "", xFmt: (v) => `${v.toFixed(v < 10 ? 1 : 0)} s`, yMin: 0, yFmt: (v) => v.toFixed(1),
+      empty: "Run an attempt with dopamine learning to see its dopamine here",
+    }),
+  };
+  function updateCharts() {
+    const eps = cur.learner.episodes, xs = eps.map((_, i) => i + 1), color = (n) => css(n);
+    const n = eps.length, learnedN = eps.filter((e) => e.mode === "learned" || e.mode === undefined).length;
+    $("chartsNote").textContent = n ? `${n} attempt${n === 1 ? "" : "s"} on this tab${learnedN < n ? `, ${learnedN} with dopamine learning` : ""}` : "";
+    const rate = rolling(eps.map((e) => (e.ok ? 100 : 0)), 20, mean);
+    charts.success.set([{ name: "success rate", color: color("--s1"), pts: xs.map((x, i) => [x, rate[i]]), fmt: (p) => `${Math.round(p[1])}%` }]);
+    const med = rolling(eps.map((e) => (e.ok ? e.t : null)), 20, median);
+    charts.time.set([
+      { name: "failed", color: color("--bad"), dots: true, faint: true, pts: eps.map((e, i) => [i + 1, e.t]).filter((_, i) => !eps[i].ok), fmt: (p) => `${p[1].toFixed(1)} s (failed)` },
+      { name: "made it", color: color("--ok"), dots: true, faint: true, pts: eps.map((e, i) => [i + 1, e.t]).filter((_, i) => eps[i].ok), fmt: (p) => `${p[1].toFixed(1)} s` },
+      { name: "median", color: color("--s1"), pts: xs.map((x, i) => [x, med[i]]).filter((p) => p[1] != null), fmt: (p) => `${p[1].toFixed(1)} s` },
+    ]);
+    const bumps = rolling(eps.map((e) => e.bumps), 20, mean);
+    charts.bumps.set([{ name: "bumps per attempt", color: color("--s1"), pts: xs.map((x, i) => [x, bumps[i]]), fmt: (p) => p[1].toFixed(1) }]);
+    const names = ["target on the right", "target on the left", "wall on the left", "wall on the right"];
+    const withPref = eps.map((e, i) => [i + 1, e.pref]).filter(([, p]) => p);
+    charts.learned.set(names.map((name, k) => ({
+      name, color: color(`--s${k + 1}`), pts: withPref.map(([x, p]) => [x, p[k]]),
+      fmt: (p) => `${p[1] > 0 ? "+" : ""}${p[1]} Hz (${p[1] > 20 ? "turns right" : p[1] < -20 ? "turns left" : "no preference"})`,
+    })));
+    for (const k of ["success", "time", "bumps", "learned"]) charts[k].draw();
+  }
+  function updateDopaChart() {
+    const d = cur.settings.steering === "learned" ? cur.dopaTrace : [];
+    charts.dopa.set([
+      { name: "PAM, reward", color: css("--s1"), pts: d.map((p) => [p[0], p[1]]), fmt: (p) => p[1].toFixed(2) },
+      { name: "PPL1, punishment", color: css("--s2"), pts: d.map((p) => [p[0], p[2]]), fmt: (p) => p[1].toFixed(2) },
+    ]);
+    charts.dopa.draw();
+  }
+
+  $("showHeat").checked = !!view.showHeat;
+  $("showHeat").onchange = (e) => { view.showHeat = e.target.checked; store.set("view", view); };
+  $("csv").onclick = () => {
+    const rows = [["attempt", "finding the target", "made it", "time_s", "bumps", "picked up load", "pref_target_right", "pref_target_left", "pref_wall_left", "pref_wall_right"]];
+    cur.learner.episodes.forEach((e, i) => rows.push([i + 1, e.mode || "learned", e.ok ? 1 : 0, e.t, e.bumps, e.carried ? 1 : 0, ...(e.pref || ["", "", "", ""])]));
+    const blob = new Blob([rows.map((r) => r.join(",")).join("\n")], { type: "text/csv" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `${cur.task}-attempts.csv`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  };
+
   // ---------- main loop ----------
-  let lastT = performance.now(), wasPlaying = false, synTick = 0;
+  let lastT = performance.now(), wasPlaying = false, synTick = 0, dopaTick = 0;
   const dopa = { pam: 0, ppl1: 0 };
   function updateDopamine(dtReal) {
     // hold each burst on screen for a moment so it can be seen at any speed
@@ -731,7 +813,8 @@
     updateMeters();
     updateStats();
     updateDopamine(dtReal);
-    if (I.curveDirty) { drawCurve(); I.curveDirty = false; }
+    if (I.curveDirty) { drawCurve(); updateCharts(); I.curveDirty = false; }
+    if ((dopaTick += dtReal) > 0.12) { dopaTick = 0; updateDopaChart(); }
     if ((synTick += dtReal) > 0.2) { synTick = 0; updateSynapses(); }
     requestAnimationFrame(frame);
   }

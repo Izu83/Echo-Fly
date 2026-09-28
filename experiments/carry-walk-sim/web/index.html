@@ -54,6 +54,42 @@
       </div>
     </div>
     <p class="hint" id="hint"></p>
+
+    <section class="panel charts" id="charts">
+      <div class="chartsHead">
+        <h2>Charts <span class="muted" id="chartsNote"></span></h2>
+        <label class="check"><input type="checkbox" id="showHeat"> Heatmap of where it walked</label>
+        <button id="csv" title="Every attempt as a spreadsheet file">Download attempts (CSV)</button>
+      </div>
+      <div class="chartGrid">
+        <figure class="chart">
+          <figcaption>Success rate <span>share of the last 20 attempts that made it</span></figcaption>
+          <div class="plot"><canvas id="cSuccess"></canvas><div class="tip" hidden></div></div>
+        </figure>
+        <figure class="chart">
+          <figcaption>Time to finish <span>dots = one attempt, line = median of the last 20 that made it</span></figcaption>
+          <div class="plot"><canvas id="cTime"></canvas><div class="tip" hidden></div></div>
+          <div class="legend small"><span><i class="dot ok"></i>made it</span><span><i class="dot bad"></i>failed (ran out of time)</span></div>
+        </figure>
+        <figure class="chart">
+          <figcaption>Bumps into walls <span>average of the last 20 attempts</span></figcaption>
+          <div class="plot"><canvas id="cBumps"></canvas><div class="tip" hidden></div></div>
+        </figure>
+        <figure class="chart">
+          <figcaption>What it has learned <span>right minus left synapse, Hz: above 0 = turns right</span></figcaption>
+          <div class="plot"><canvas id="cLearned"></canvas><div class="tip" hidden></div></div>
+          <div class="legend small">
+            <span><i class="line s1"></i>target on the right</span><span><i class="line s2"></i>target on the left</span>
+            <span><i class="line s3"></i>wall on the left</span><span><i class="line s4"></i>wall on the right</span>
+          </div>
+        </figure>
+        <figure class="chart wide">
+          <figcaption>Dopamine in this attempt <span>reward (PAM) and punishment (PPL1) over time</span></figcaption>
+          <div class="plot"><canvas id="cDopa"></canvas><div class="tip" hidden></div></div>
+          <div class="legend small"><span><i class="line s1"></i>PAM, reward</span><span><i class="line s2"></i>PPL1, punishment</span></div>
+        </figure>
+      </div>
+    </section>
   </section>
 
   <aside>
@@ -187,6 +223,7 @@
 <script src="sim.js"></script>
 <script src="presets.js"></script>
 <script src="learning.js"></script>
+<script src="charts.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
